@@ -1,7 +1,0 @@
-name = "topluluk"
-main = "worker.js"
-compatibility_date = "2026-09-27"
-workers_dev = true
-
-# D1 (DB) ve Static Assets (turkmc assets) bindingleri Cloudflare Dashboard'da mevcut.
-# Bu dosya dashboard'daki binding isimlerini ezmemesi için ayrıca binding tanımlamaz.
