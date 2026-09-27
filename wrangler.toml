@@ -1,0 +1,9 @@
+name = "topluluk"
+main = "worker.js"
+compatibility_date = "2026-09-27"
+
+[assets]
+directory = "."
+binding = "ASSETS"
+
+# D1 binding is already configured in the Cloudflare dashboard as DB.
