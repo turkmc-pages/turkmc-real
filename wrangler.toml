@@ -11,3 +11,11 @@ run_worker_first = ["/api/*", "/admin"]
 binding = "DB"
 database_name = "turkmc-db"
 database_id = "7cde682f-0ada-4629-b55b-49485372a83d"
+
+# Özel alan adı bağlamak istersen (örn. turkmc.com):
+# alan adını önce Cloudflare hesabına ekleyip zone yap, sonra
+# aşağıdaki iki satırı aç ve "senin-alan-adin.com" kısmını
+# kendi alan adınla değiştir, sonra tekrar deploy et.
+# [[routes]]
+# pattern = "senin-alan-adin.com"
+# custom_domain = true
