@@ -10,6 +10,8 @@ const TYPES = [
   "PvP",
   "BedWars",
   "Pixelmon",
+  "Klan",
+  "Tier List",
   "Diğer"
 ];
 
