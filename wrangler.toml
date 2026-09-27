@@ -4,5 +4,10 @@ compatibility_date = "2026-09-27"
 
 [assets]
 directory = "."
-binding = "turkmc assets"
+binding = "ASSETS"
 run_worker_first = ["/api/*", "/admin", "/admin/*"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "turkmc-db"
+database_id = "7cde682f-0ada-4629-b55b-49485372a83d"
