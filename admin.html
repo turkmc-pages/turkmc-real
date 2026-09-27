@@ -43,25 +43,41 @@ a{color:#f5c542}
 </div>
 
 <script>
+const ADMIN_PASSWORD = "kerimingotu";
+
 const types=["Survival","SkyBlock","Factions","Towny","TrapPvP","PvP","BedWars","Pixelmon","Diğer"];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const msg=(t,ok=false)=>document.getElementById("msg").innerHTML='<div class="msg '+(ok?'ok':'err')+'">'+esc(t)+'</div>';
 
 async function login(){
   const password=document.getElementById("password").value;
-  const r=await fetch("/api/admin/login",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({password})});
-  const d=await r.json().catch(()=>({}));
-  if(!r.ok){document.getElementById("loginMsg").innerHTML='<div class="msg err">'+esc(d.error||"Giriş başarısız.")+"</div>";return}
+
+  if(password !== ADMIN_PASSWORD){
+    document.getElementById("loginMsg").innerHTML='<div class="msg err">Şifre yanlış.</div>';
+    return;
+  }
+
   document.getElementById("login").classList.add("hidden");
   document.getElementById("panel").classList.remove("hidden");
   load();
 }
+
 async function load(){
   const r=await fetch("/api/admin/servers");
-  if(r.status===401){document.getElementById("panel").classList.add("hidden");document.getElementById("login").classList.remove("hidden");return}
+  if(r.status===401){
+    document.getElementById("panel").classList.add("hidden");
+    document.getElementById("login").classList.remove("hidden");
+    return
+  }
+
   const list=await r.json();
   const box=document.getElementById("servers");
-  if(!list.length){box.innerHTML="<p>Henüz sunucu başvurusu yok.</p>";return}
+
+  if(!list.length){
+    box.innerHTML="<p>Henüz sunucu başvurusu yok.</p>";
+    return
+  }
+
   box.innerHTML=list.map(s=>`
     <div class="server">
       <div class="tag">${esc(s.status==="approved"?"YAYINDA":"ONAY BEKLİYOR")}</div>
@@ -77,15 +93,18 @@ async function load(){
       </div>
     </div>`).join("");
 }
+
 async function approve(id){
   const r=await fetch("/api/admin/servers/"+id+"/approve",{method:"POST"});
   msg(r.ok?"Sunucu yayınlandı.":"Onaylama başarısız.",r.ok);load();
 }
+
 async function removeServer(id){
   if(!confirm("Bu sunucu silinsin mi?"))return;
   const r=await fetch("/api/admin/servers/"+id,{method:"DELETE"});
   msg(r.ok?"Sunucu silindi.":"Silme başarısız.",r.ok);load();
 }
+
 async function edit(s){
   const name=prompt("Sunucu adı:",s.name); if(name===null)return;
   const ip=prompt("IP:",s.ip); if(ip===null)return;
@@ -96,6 +115,7 @@ async function edit(s){
   const r=await fetch("/api/admin/servers/"+s.id,{method:"PUT",headers:{"content-type":"application/json"},body:JSON.stringify({name,ip,type,website,description,status})});
   msg(r.ok?"Sunucu güncellendi.":(await r.json()).error||"Güncelleme başarısız.",r.ok);load();
 }
+
 async function logout(){
   await fetch("/api/admin/logout",{method:"POST"});
   location.reload();
