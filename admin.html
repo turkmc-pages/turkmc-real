@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TURKMC Yönetim</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#eee;background:#111;min-height:100vh}
+body:before{content:"";position:fixed;inset:0;background:linear-gradient(135deg,#111 0%,#1b1405 55%,#090909 100%);z-index:-2}
+.wrap{width:min(1100px,94%);margin:0 auto;padding:40px 0}
+.card{background:rgba(20,20,20,.94);border:1px solid #8f6a20;border-radius:16px;padding:24px;box-shadow:0 10px 35px #0008;margin-bottom:20px}
+h1,h2{color:#f5c542}input,select,textarea{width:100%;padding:12px;margin:7px 0 14px;background:#111;color:#fff;border:1px solid #555;border-radius:8px}textarea{min-height:100px;resize:vertical}
+button{border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer;background:#d9a927;color:#111;margin:4px}
+button.danger{background:#b52a2a;color:#fff}button.gray{background:#444;color:#fff}
+.hidden{display:none}.msg{padding:12px;border-radius:8px;margin:10px 0}.err{background:#481c1c}.ok{background:#173c22}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:15px}.server{border:1px solid #444;border-radius:12px;padding:16px;background:#181818}
+.small{color:#aaa;font-size:13px}.tag{display:inline-block;border:1px solid #8f6a20;border-radius:20px;padding:4px 9px;color:#f5c542;font-size:12px}
+.top{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
+a{color:#f5c542}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="login" class="card">
+    <h1>🔐 TURKMC Yönetim</h1>
+    <p class="small">Yönetim paneline girmek için yönetici şifresini gir.</p>
+    <input id="password" type="password" placeholder="Yönetici şifresi">
+    <button onclick="login()">Giriş Yap</button>
+    <div id="loginMsg"></div>
+  </div>
+
+  <div id="panel" class="hidden">
+    <div class="card top">
+      <div><h1 style="margin:0">TURKMC Yönetim Paneli</h1><span class="small">Sunucu başvurularını buradan yönet.</span></div>
+      <button class="gray" onclick="logout()">Çıkış</button>
+    </div>
+    <div id="msg"></div>
+    <div class="card">
+      <h2>Sunucular</h2>
+      <div id="servers" class="grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const types=["Survival","SkyBlock","Factions","Towny","TrapPvP","PvP","BedWars","Pixelmon","Diğer"];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const msg=(t,ok=false)=>document.getElementById("msg").innerHTML='<div class="msg '+(ok?'ok':'err')+'">'+esc(t)+'</div>';
+
+async function login(){
+  const password=document.getElementById("password").value;
+  const r=await fetch("/api/admin/login",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({password})});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok){document.getElementById("loginMsg").innerHTML='<div class="msg err">'+esc(d.error||"Giriş başarısız.")+"</div>";return}
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("panel").classList.remove("hidden");
+  load();
+}
+async function load(){
+  const r=await fetch("/api/admin/servers");
+  if(r.status===401){document.getElementById("panel").classList.add("hidden");document.getElementById("login").classList.remove("hidden");return}
+  const list=await r.json();
+  const box=document.getElementById("servers");
+  if(!list.length){box.innerHTML="<p>Henüz sunucu başvurusu yok.</p>";return}
+  box.innerHTML=list.map(s=>`
+    <div class="server">
+      <div class="tag">${esc(s.status==="approved"?"YAYINDA":"ONAY BEKLİYOR")}</div>
+      <h3>${esc(s.name)}</h3>
+      <div><b>IP:</b> ${esc(s.ip)}</div>
+      <div><b>Tür:</b> ${esc(s.type)}</div>
+      <p>${esc(s.description||"Açıklama yok.")}</p>
+      ${s.website?`<div><a href="${esc(s.website)}" target="_blank" rel="noopener">Bağlantıyı aç</a></div>`:""}
+      <div style="margin-top:10px">
+        ${s.status!=="approved"?`<button onclick="approve(${s.id})">✓ Onayla</button>`:""}
+        <button onclick='edit(${JSON.stringify(s).replace(/</g,"\\u003c")})'>Düzenle</button>
+        <button class="danger" onclick="removeServer(${s.id})">Sil</button>
+      </div>
+    </div>`).join("");
+}
+async function approve(id){
+  const r=await fetch("/api/admin/servers/"+id+"/approve",{method:"POST"});
+  msg(r.ok?"Sunucu yayınlandı.":"Onaylama başarısız.",r.ok);load();
+}
+async function removeServer(id){
+  if(!confirm("Bu sunucu silinsin mi?"))return;
+  const r=await fetch("/api/admin/servers/"+id,{method:"DELETE"});
+  msg(r.ok?"Sunucu silindi.":"Silme başarısız.",r.ok);load();
+}
+async function edit(s){
+  const name=prompt("Sunucu adı:",s.name); if(name===null)return;
+  const ip=prompt("IP:",s.ip); if(ip===null)return;
+  const type=prompt("Tür (Survival, SkyBlock, Factions, Towny, TrapPvP, PvP, BedWars, Pixelmon, Diğer):",s.type); if(type===null)return;
+  const website=prompt("Discord/Web sitesi:",s.website||""); if(website===null)return;
+  const description=prompt("Açıklama:",s.description||""); if(description===null)return;
+  const status=confirm("Yayınlansın mı? Tamam = yayınla, İptal = onay beklesin.")?"approved":"pending";
+  const r=await fetch("/api/admin/servers/"+s.id,{method:"PUT",headers:{"content-type":"application/json"},body:JSON.stringify({name,ip,type,website,description,status})});
+  msg(r.ok?"Sunucu güncellendi.":(await r.json()).error||"Güncelleme başarısız.",r.ok);load();
+}
+async function logout(){
+  await fetch("/api/admin/logout",{method:"POST"});
+  location.reload();
+}
+</script>
+</body>
+</html>
