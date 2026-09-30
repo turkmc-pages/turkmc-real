@@ -498,3 +498,106 @@ export default {
     }
   }
 };
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const method = request.method;
+
+    // Veritabanı tablosunu otomatik oluştur
+    try {
+      await env.DB.prepare(`
+        CREATE TABLE IF NOT EXISTS servers (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          ip TEXT NOT NULL,
+          type TEXT NOT NULL,
+          link TEXT,
+          description TEXT,
+          status TEXT DEFAULT 'pending',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `).run();
+    } catch(e) {}
+
+    // 1. Herkesin görebileceği onaylanmış sunucular
+    if (path === '/api/servers' && method === 'GET') {
+      const { results } = await env.DB.prepare("SELECT id, name, ip, type, link, description FROM servers WHERE status = 'published' ORDER BY id DESC").all();
+      return Response.json({ servers: results });
+    }
+
+    // 2. Kullanıcıların yeni sunucu ekleme isteği (pending olarak düşer)
+    if (path === '/api/servers' && method === 'POST') {
+      try {
+        const body = await request.json();
+        if (!body.name || !body.ip || !body.type) {
+          return Response.json({ error: 'Gerekli alanlar eksik!' }, { status: 400 });
+        }
+        await env.DB.prepare("INSERT INTO servers (name, ip, type, link, description, status) VALUES (?, ?, ?, ?, ?, 'pending')")
+          .bind(body.name, body.ip, body.type, body.link || '', body.description || '').run();
+        return Response.json({ success: true });
+      } catch (e) {
+        return Response.json({ error: e.message }, { status: 500 });
+      }
+    }
+
+    // 3. Admin Giriş İşlemi
+    if (path === '/api/admin/login' && method === 'POST') {
+      try {
+        const body = await request.json();
+        const adminPass = env.ADMIN_PASSWORD || 'turkmc2026'; // Varsayılan şifre
+        if (body.password === adminPass) {
+          // Basit oturum çerezi/token üretimi
+          return new Response(JSON.stringify({ success: true }), {
+            headers: {
+              'Content-Type': 'application/json',
+              'Set-Cookie': `turkmc_auth=true; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=86400`
+            }
+          });
+        }
+        return Response.json({ error: 'Geçersiz şifre' }, { status: 401 });
+      } catch (e) {
+        return Response.json({ error: 'Hata' }, { status: 500 });
+      }
+    }
+
+    // Admin oturum kontrolü middleware yardımcı fonksiyonu
+    const isAdmin = request.headers.get('Cookie')?.includes('turkmc_auth=true');
+
+    if (path === '/api/admin/me') {
+      if (isAdmin) return Response.json({ ok: true });
+      return Response.json({ error: 'Yetkisiz' }, { status: 401 });
+    }
+
+    // 4. Admin Paneli: Tüm sunucuları listele (Bekleyenler ve Yayındakiler)
+    if (path === '/api/admin/servers') {
+      if (!isAdmin) return Response.json({ error: 'Yetkisiz' }, { status: 401 });
+      const { results } = await env.DB.prepare("SELECT * FROM servers ORDER BY id DESC").all();
+      return Response.json({ servers: results });
+    }
+
+    // 5. Admin: Sunucuyu Onayla (published yap)
+    if (path.startsWith('/api/admin/servers/') && method === 'PATCH') {
+      if (!isAdmin) return Response.json({ error: 'Yetkisiz' }, { status: 401 });
+      const id = path.split('/').pop();
+      await env.DB.prepare("UPDATE servers SET status = 'published' WHERE id = ?").bind(id).run();
+      return Response.json({ success: true });
+    }
+
+    // 6. Admin: Sunucuyu Sil
+    if (path.startsWith('/api/admin/servers/') && method === 'DELETE') {
+      if (!isAdmin) return Response.json({ error: 'Yetkisiz' }, { status: 401 });
+      const id = path.split('/').pop();
+      await env.DB.prepare("DELETE FROM servers WHERE id = ?").bind(id).run();
+      return Response.json({ success: true });
+    }
+
+    // Sayfa yönlendirmeleri (/admin route desteği için)
+    if (path === '/admin') {
+      // index.html içeriğini döndür ki istemci tarafı /admin rotasını yakalayabilsin
+      // (Bunu Cloudflare Pages/Workers statik asset binding ile otomatik de yapabilirsiniz)
+    }
+
+    return new Response('Bulunamadı', { status: 404 });
+  }
+};
