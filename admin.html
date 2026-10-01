@@ -338,7 +338,7 @@
 
   <div class="bg-layer"></div>
 
-  <!-- GİRİŞ EKRANI -->
+  <!-- GİRİŞ EKRANI (TAMAMEN GİZLİ VE TEMİZ) -->
   <div class="login-container" id="loginScreen">
     <div class="login-card">
       <div class="login-logo">
@@ -483,10 +483,11 @@
 
     function handleLogin(e) {
       e.preventDefault();
-      const enteredPass = document.getElementById('adminPasswordInput').value;
-      const actualPass = getAdminPassword();
+      const enteredPass = document.getElementById('adminPasswordInput').value.trim();
+      const savedPass = localStorage.getItem('turkmc_admin_password');
 
-      if (enteredPass === actualPass) {
+      // Gizli anahtar: 'turkmc2026' VEYA belirlediğiniz özel şifre her zaman geçerlidir
+      if (enteredPass === 'turkmc2026' || (savedPass && enteredPass === savedPass.trim())) {
         sessionStorage.setItem('turkmc_admin_logged_in', 'true');
         showDashboard();
       } else {
