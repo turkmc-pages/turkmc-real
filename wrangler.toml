@@ -1,13 +1,7 @@
-name = "turkmc-real"
+name = "topluluk"
 main = "worker.js"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-09-23"
 
-# Statik dosyaları (HTML, PNG vb.) doğrudan sunmak için
 [assets]
 directory = "."
 binding = "ASSETS"
-
-# İsteğe Bağlı KV Depolama Alanı (Cloudflare Panelinden oluşturulabilir)
-# [[kv_namespaces]]
-# binding = "TURKMC_KV"
-# id = "your_kv_namespace_id"
