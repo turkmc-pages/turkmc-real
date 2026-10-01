@@ -45,7 +45,7 @@
       position: fixed;
       inset: 0;
       background: 
-        linear-gradient(180deg, rgba(10, 13, 20, 0.8) 0%, rgba(10, 13, 20, 0.92) 55%, #0a0d14 100%),
+        linear-gradient(180deg, rgba(10, 13, 20, 0.75) 0%, rgba(10, 13, 20, 0.92) 55%, #0a0d14 100%),
         url('background.png') center center / cover no-repeat,
         url('https://images.unsplash.com/photo-1627856013091-fed6e4e30025?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat;
       z-index: -2;
@@ -139,7 +139,7 @@
       background: rgba(255, 255, 255, 0.08);
     }
 
-    /* Açılır Kategori Menüsü (Görsel 5 Stili) */
+    /* Açılır Kategori Menüsü */
     .dropdown-content {
       position: absolute;
       top: 100%;
@@ -997,7 +997,7 @@
     </section>
   </main>
 
-  <!-- MODAL: Sunucu Detayları (Görsel 4 formatı) -->
+  <!-- MODAL: Sunucu Detayları -->
   <div class="modal-backdrop" id="detailModal">
     <div class="modal-card">
       <button class="modal-close-icon" onclick="closeModal('detailModal')">✕</button>
@@ -1173,72 +1173,8 @@
   </footer>
 
   <script>
-    const DEFAULT_SERVERS = [
-      {
-        id: "srv-1",
-        name: "PurpurMC",
-        ip: "oyna.purpurmc.com",
-        category: "Survival",
-        version: "26.2 / 1.20 - 1.21",
-        slot: "2026 Oyuncu",
-        difficulty: "Emek",
-        slogan: "26.2 Son Sürüm SMP - Sesli Sohbet, Özel Claim ve Ekonomi Sistemi!",
-        banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80",
-        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=PurpurMC",
-        discord: "https://discord.gg/turkmc",
-        web: "https://purpurmc.com",
-        featured: true,
-        description: "PurpurMC, Türkiye'nin en gelişmiş ve yenilikçi SMP Survival sunucularından biridir.\n\nÖzellikler:\n• Gelişmiş Claim & Güvenlik Sistemi\n• Sesli Sohbet (Proximity Chat) desteği\n• Özel Meslekler ve Dengeli Ekonomi\n• BattlePass ve Günlük Ödüller\n• 7/24 Kesintisiz Aktif Destek Ekibi"
-      },
-      {
-        id: "srv-2",
-        name: "RebornCraft",
-        ip: "play.reborncraft.pw",
-        category: "Skyblock",
-        version: "1.16 - 1.20",
-        slot: "1000 Oyuncu",
-        difficulty: "Orta",
-        slogan: "Yenilikçi Skyblock Deneyimi, Ada Yükseltmeleri ve Minyonlar!",
-        banner: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
-        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=RebornCraft",
-        discord: "https://discord.gg/turkmc",
-        web: "",
-        featured: true,
-        description: "RebornCraft Skyblock dünyasında kendi adanı kur, minyonlarını çalıştır ve en güçlü ada sahibi ol!\n\nÖne Çıkanlar:\n• Özel Ada Görevleri ve Seviyeleri\n• Otomatik Minyon Sistemleri\n• Haftalık Ada Sıralaması ve Ödüller"
-      },
-      {
-        id: "srv-3",
-        name: "SentorCraft",
-        ip: "play.sentorcraft.com",
-        category: "Towny",
-        version: "1.20.4",
-        slot: "800 Oyuncu",
-        difficulty: "Emek",
-        slogan: "Gerçek Dünya Haritası Üzerinde Kendi Krallığını ve Şehrini Kur!",
-        banner: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
-        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=SentorCraft",
-        discord: "https://discord.gg/turkmc",
-        web: "",
-        featured: false,
-        description: "SentorCraft Towny sunucusunda ulusunu kur, sınırlarını genişlet ve diplomasi geliştir!\n\nÖzellikler:\n• 1:500 Gerçek Dünya Haritası\n• Kuşatma ve Savaş Sistemleri\n• Ulusal Ticaret ve Bankacılık"
-      },
-      {
-        id: "srv-4",
-        name: "MuzCraft",
-        ip: "mc.muzcraft.com",
-        category: "Faction",
-        version: "1.8 - 1.20",
-        slot: "1500 Oyuncu",
-        difficulty: "Zor",
-        slogan: "7 Yıldır Sıfırlanmayan Türkiye'nin Tek Köklü Faction Sunucusu!",
-        banner: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80",
-        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=MuzCraft",
-        discord: "https://discord.gg/turkmc",
-        web: "",
-        featured: false,
-        description: "MuzCraft Faction'da klanını topla, TNT toplarını hazırla ve düşman kalelerini fethet!\n\nÖne Çıkanlar:\n• Sıfırlanmayan Emek Klan Arenası\n• Özel Boss Zindanları\n• Koth ve Outpost Savaşları"
-      }
-    ];
+    // Başlangıçta boş başlar, sadece eklenen ve onaylanan sunucular görünür!
+    const DEFAULT_SERVERS = [];
 
     function getInitialServers() {
       const saved = localStorage.getItem('turkmc_approved_servers');
@@ -1247,8 +1183,7 @@
           return JSON.parse(saved);
         } catch(e) {}
       }
-      localStorage.setItem('turkmc_approved_servers', JSON.stringify(DEFAULT_SERVERS));
-      return DEFAULT_SERVERS;
+      return [];
     }
 
     let allServers = getInitialServers();
@@ -1256,7 +1191,7 @@
     let currentSearchTerm = '';
     let currentSelectedServer = null;
 
-    // Cloudflare Workers API Senkronizasyonu (Varsa API'den Çeker)
+    // Cloudflare Workers API Senkronizasyonu
     async function syncWithServer() {
       try {
         const res = await fetch('/api/servers');
@@ -1268,9 +1203,7 @@
             renderServers();
           }
         }
-      } catch (err) {
-        // Yerel çalışma veya API yoksa localStorage ile sorunsuz devam eder
-      }
+      } catch (err) {}
     }
 
     function renderServers() {
@@ -1292,11 +1225,15 @@
 
       if (filtered.length === 0) {
         grid.innerHTML = `
-          <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; background: rgba(15, 23, 42, 0.5); border-radius: 16px; border: 1px dashed rgba(255, 255, 255, 0.1);">
-            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
-            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.4rem;">Aradığınız kriterlere uygun sunucu bulunamadı</h3>
-            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.2rem;">Farklı bir kategori seçebilir veya ilk sunucuyu sen tanıtabilirsin!</p>
-            <button class="btn btn-gold" onclick="openAddModal()">+ İlk Sen Sunucu Ekle</button>
+          <div style="grid-column: 1 / -1; text-align: center; padding: 4.5rem 1.5rem; background: rgba(15, 23, 42, 0.6); border-radius: 18px; border: 1px dashed rgba(255, 255, 255, 0.12); backdrop-filter: blur(10px);">
+            <div style="font-size: 3rem; margin-bottom: 0.6rem;">🏰</div>
+            <h3 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 0.4rem; color: #fff;">Şu Anda Yayında Onaylanmış Sunucu Bulunmuyor</h3>
+            <p style="color: #94a3b8; font-size: 0.925rem; max-width: 500px; margin: 0 auto 1.5rem;">
+              Topluluğumuza ilk katılan sunucu olmak veya kendi sunucunu tanıtmak için hemen başvur!
+            </p>
+            <button class="btn btn-gold" style="font-size: 1rem; padding: 0.75rem 1.6rem;" onclick="openAddModal()">
+              + İlk Sen Sunucu Ekle (Ücretsiz)
+            </button>
           </div>
         `;
         return;
@@ -1455,7 +1392,6 @@
         status: 'pending'
       };
 
-      // 1. Yerel Depoya Kaydet
       let pendingList = [];
       const savedPending = localStorage.getItem('turkmc_pending_servers');
       if (savedPending) {
@@ -1464,7 +1400,6 @@
       pendingList.push(newApplication);
       localStorage.setItem('turkmc_pending_servers', JSON.stringify(pendingList));
 
-      // 2. Cloudflare API'ye Gönder (Varsa)
       try {
         await fetch('/api/servers/apply', {
           method: 'POST',
