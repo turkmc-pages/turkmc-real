@@ -24,9 +24,7 @@
     .admin-navbar { background: rgba(10, 13, 20, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); position: sticky; top: 0; z-index: 50; }
     .admin-nav-inner { max-width: 1400px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
     .admin-container { max-width: 1400px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 2.5rem; }
-    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr; } }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem; }
     .stat-card { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 1.35rem; position: relative; }
     .stat-card .num { font-size: 2.2rem; font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 0.25rem; }
     .stat-card .label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
@@ -76,7 +74,7 @@
       </div>
       <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.4rem;">Yönetici Girişi</h2>
       <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem;">
-        Sunucu, Klan ve Tierlist başvurularını yönetmek için şifrenizi girin.
+        Sunucu, Klan, Tierlist ve ResourcePack başvurularını yönetmek için şifrenizi girin.
       </p>
 
       <form onsubmit="handleLogin(event)">
@@ -133,6 +131,10 @@
           <div class="num" id="statTierCount">0</div>
           <div class="label">🏆 Tierlist Sunucuları (Aktif)</div>
         </div>
+        <div class="stat-card" style="border-left: 4px solid #06b6d4;">
+          <div class="num" id="statPackCount">0</div>
+          <div class="label">🎨 ResourcePackler (Aktif)</div>
+        </div>
       </div>
 
       <!-- ANA SEKMELER -->
@@ -160,6 +162,9 @@
           <button class="subtab-btn" onclick="switchPendingSubTab('tierlist')" id="subtabPendingTier">
             🏆 Tierlist Başvuruları (<span id="countPendingTier">0</span>)
           </button>
+          <button class="subtab-btn" onclick="switchPendingSubTab('packs')" id="subtabPendingPacks">
+            🎨 ResourcePack Başvuruları (<span id="countPendingPacks">0</span>)
+          </button>
         </div>
         <div id="pendingListContainer"></div>
       </div>
@@ -175,6 +180,9 @@
           </button>
           <button class="subtab-btn" onclick="switchLiveSubTab('tierlist')" id="subtabLiveTier">
             🏆 Yayındaki Tierlist Sunucuları (<span id="countLiveTier">0</span>)
+          </button>
+          <button class="subtab-btn" onclick="switchLiveSubTab('packs')" id="subtabLivePacks">
+            🎨 Yayındaki ResourcePackler (<span id="countLivePacks">0</span>)
           </button>
         </div>
         <div id="liveListContainer"></div>
@@ -194,7 +202,7 @@
 
           <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">💾 Veri Yönetimi & Yedekleme</h3>
           <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
-            Tüm 3 kategorideki verileri (Sunucular, Klanlar, Tierlistler) tek tıkla JSON formatında indirebilirsiniz.
+            Tüm kategorilerdeki verileri tek tıkla JSON formatında indirebilirsiniz.
           </p>
 
           <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
@@ -264,6 +272,7 @@
       document.getElementById('subtabPendingServers').classList.toggle('active', sub === 'servers');
       document.getElementById('subtabPendingClans').classList.toggle('active', sub === 'clans');
       document.getElementById('subtabPendingTier').classList.toggle('active', sub === 'tierlist');
+      document.getElementById('subtabPendingPacks').classList.toggle('active', sub === 'packs');
       renderPendingList();
     }
 
@@ -272,6 +281,7 @@
       document.getElementById('subtabLiveServers').classList.toggle('active', sub === 'servers');
       document.getElementById('subtabLiveClans').classList.toggle('active', sub === 'clans');
       document.getElementById('subtabLiveTier').classList.toggle('active', sub === 'tierlist');
+      document.getElementById('subtabLivePacks').classList.toggle('active', sub === 'packs');
       renderLiveList();
     }
 
@@ -279,26 +289,31 @@
       const pendingServers = getData('turkmc_pending_servers');
       const pendingClans = getData('turkmc_pending_clans');
       const pendingTier = getData('turkmc_pending_tierlist');
+      const pendingPacks = getData('turkmc_pending_packs');
 
       const liveServers = getData('turkmc_approved_servers');
       const liveClans = getData('turkmc_approved_clans');
       const liveTier = getData('turkmc_approved_tierlist');
+      const livePacks = getData('turkmc_approved_packs');
 
-      const totalPending = pendingServers.length + pendingClans.length + pendingTier.length;
+      const totalPending = pendingServers.length + pendingClans.length + pendingTier.length + pendingPacks.length;
 
       document.getElementById('statPendingTotalCount').textContent = totalPending;
       document.getElementById('statServerCount').textContent = liveServers.length;
       document.getElementById('statClanCount').textContent = liveClans.length;
       document.getElementById('statTierCount').textContent = liveTier.length;
+      document.getElementById('statPackCount').textContent = livePacks.length;
 
       document.getElementById('tabBadgePending').textContent = totalPending;
       document.getElementById('countPendingServers').textContent = pendingServers.length;
       document.getElementById('countPendingClans').textContent = pendingClans.length;
       document.getElementById('countPendingTier').textContent = pendingTier.length;
+      document.getElementById('countPendingPacks').textContent = pendingPacks.length;
 
       document.getElementById('countLiveServers').textContent = liveServers.length;
       document.getElementById('countLiveClans').textContent = liveClans.length;
       document.getElementById('countLiveTier').textContent = liveTier.length;
+      document.getElementById('countLivePacks').textContent = livePacks.length;
 
       if (currentMainTab === 'pending') renderPendingList();
       else if (currentMainTab === 'live') renderLiveList();
@@ -387,6 +402,33 @@
             </div>
           </div>
         `).join('');
+
+      } else if (currentPendingSubTab === 'packs') {
+        const list = getData('turkmc_pending_packs');
+        if (list.length === 0) { container.innerHTML = getEmptyState("🎨 Bekleyen ResourcePack başvurusu yok."); return; }
+        container.innerHTML = list.map(item => `
+          <div class="application-card">
+            <div class="app-banner-row"><img src="${item.img || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80'}" class="app-banner-img"></div>
+            <div class="app-content-body">
+              <div class="app-header">
+                <div><h3 style="font-size: 1.3rem; font-weight: 800; color: #fff;">${item.name}</h3><p style="color: #38bdf8; font-size: 0.88rem;">Çözünürlük: ${item.res}</p></div>
+                <span style="background: rgba(6, 182, 212, 0.2); color: #22d3ee; padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">${item.version}</span>
+              </div>
+              <div class="app-specs">
+                <div><strong>Sürüm:</strong> ${item.version}</div><div><strong>Çözünürlük:</strong> ${item.res}</div>
+                <div><strong>İndirme Linki:</strong> <a href="${item.link}" target="_blank" style="color:#38bdf8;">Test Et ➔</a></div>
+                <div><strong>Tarih:</strong> ${item.appliedAt || 'Bugün'}</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.25); padding: 0.8rem; border-radius: 8px; font-size: 0.88rem; color: #cbd5e1; white-space: pre-line; margin-bottom: 1rem;">
+                <strong>Açıklama:</strong><br>${item.desc}
+              </div>
+              <div class="app-actions">
+                <button class="btn btn-danger" onclick="rejectItem('turkmc_pending_packs', '${item.id}')">✕ Reddet / Sil</button>
+                <button class="btn btn-success" onclick="approvePack('${item.id}')">✓ Kabul Et (Yayına Al)</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
       }
     }
 
@@ -443,71 +485,107 @@
             </div>
           </div>
         `).join('');
+
+      } else if (currentLiveSubTab === 'packs') {
+        const list = getData('turkmc_approved_packs');
+        if (list.length === 0) { container.innerHTML = getEmptyState("Yayında ResourcePack bulunmuyor."); return; }
+        container.innerHTML = list.map(item => `
+          <div class="application-card" style="margin-bottom: 1rem;">
+            <div class="app-content-body" style="padding: 1.2rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <img src="${item.img || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80'}" style="width: 56px; height: 44px; border-radius: 8px; object-fit: cover;">
+                  <div><h4 style="font-size: 1.1rem; font-weight: 800;">${item.name}</h4><span style="font-size: 0.82rem; color: #22d3ee;">${item.version} | ${item.res} | 📥 ${item.downloads || 0} İndirme</span></div>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                  <a href="${item.link}" target="_blank" class="btn btn-ghost" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;">Linki Aç</a>
+                  <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;" onclick="deleteLiveItem('turkmc_approved_packs', '${item.id}')">Yayından Kaldır</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
       }
     }
 
     function getEmptyState(text) {
       return `
-        <div style="text-align: center; padding: 3rem; background: rgba(15, 23, 42, 0.6); border-radius: 16px; border: 1px dashed rgba(255, 255, 255, 0.1);">
-          <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🎉</div>
-          <h4 style="font-size: 1.1rem; font-weight: 700;">${text}</h4>
-          <p style="color: #64748b; font-size: 0.85rem;">Yeni bir başvuru yapıldığında otomatik burada listelenecektir.</p>
+        <div style="text-align: center; padding: 3rem 1rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); color: #64748b;">
+          <p style="font-size: 0.95rem;">${text}</p>
         </div>
       `;
     }
 
     function approveServer(id) {
-      const pending = getData('turkmc_pending_servers');
-      const target = pending.find(p => p.id === id);
-      if (!target) return;
-      setData('turkmc_pending_servers', pending.filter(p => p.id !== id));
-      const live = getData('turkmc_approved_servers');
-      target.id = "srv-" + Date.now();
-      target.status = 'approved';
-      live.unshift(target);
-      setData('turkmc_approved_servers', live);
-      showToast(`✅ "${target.name}" sunucusu yayına alındı!`);
-      loadDashboardData();
+      let pending = getData('turkmc_pending_servers');
+      let live = getData('turkmc_approved_servers');
+      const item = pending.find(x => x.id === id);
+      if (item) {
+        pending = pending.filter(x => x.id !== id);
+        live.push({ ...item, approvedAt: new Date().toLocaleString('tr-TR') });
+        setData('turkmc_pending_servers', pending);
+        setData('turkmc_approved_servers', live);
+        showToast("✓ Sunucu onaylandı ve ana sayfaya eklendi!");
+        loadDashboardData();
+      }
     }
 
     function approveClan(id) {
-      const pending = getData('turkmc_pending_clans');
-      const target = pending.find(p => p.id === id);
-      if (!target) return;
-      setData('turkmc_pending_clans', pending.filter(p => p.id !== id));
-      const live = getData('turkmc_approved_clans');
-      target.id = "clan-" + Date.now();
-      target.status = 'approved';
-      live.unshift(target);
-      setData('turkmc_approved_clans', live);
-      showToast(`⚔️ "${target.name}" klanı yayına alındı!`);
-      loadDashboardData();
+      let pending = getData('turkmc_pending_clans');
+      let live = getData('turkmc_approved_clans');
+      const item = pending.find(x => x.id === id);
+      if (item) {
+        pending = pending.filter(x => x.id !== id);
+        live.push({ ...item, approvedAt: new Date().toLocaleString('tr-TR') });
+        setData('turkmc_pending_clans', pending);
+        setData('turkmc_approved_clans', live);
+        showToast("⚔️ Klan onaylandı ve yayına alındı!");
+        loadDashboardData();
+      }
+    }
+
+    function approvePack(id) {
+      let pending = getData('turkmc_pending_packs');
+      let live = getData('turkmc_approved_packs');
+      const item = pending.find(x => x.id === id);
+      if (item) {
+        pending = pending.filter(x => x.id !== id);
+        live.push({ ...item, approvedAt: new Date().toLocaleString('tr-TR'), downloads: item.downloads || 0 });
+        setData('turkmc_pending_packs', pending);
+        setData('turkmc_approved_packs', live);
+        showToast("🎨 ResourcePack yayına alındı!");
+        loadDashboardData();
+      }
     }
 
     function approveTier(id) {
-      const pending = getData('turkmc_pending_tierlist');
-      const target = pending.find(p => p.id === id);
-      if (!target) return;
-      setData('turkmc_pending_tierlist', pending.filter(p => p.id !== id));
-      const live = getData('turkmc_approved_tierlist');
-      target.id = "tier-" + Date.now();
-      target.status = 'approved';
-      live.unshift(target);
-      setData('turkmc_approved_tierlist', live);
-      showToast(`🏆 "${target.name}" Tierlist sunucusu yayına alındı!`);
-      loadDashboardData();
+      let pending = getData('turkmc_pending_tierlist');
+      let live = getData('turkmc_approved_tierlist');
+      const item = pending.find(x => x.id === id);
+      if (item) {
+        pending = pending.filter(x => x.id !== id);
+        live.push({ ...item, approvedAt: new Date().toLocaleString('tr-TR') });
+        setData('turkmc_pending_tierlist', pending);
+        setData('turkmc_approved_tierlist', live);
+        showToast("🏆 Tierlist onaylandı ve yayına alındı!");
+        loadDashboardData();
+      }
     }
 
     function rejectItem(key, id) {
-      if (!confirm("Bu başvuruyu reddetmek ve silmek istediğinize emin misiniz?")) return;
-      setData(key, getData(key).filter(p => p.id !== id));
-      showToast("❌ Başvuru reddedildi ve silindi.");
+      if (!confirm("Bu başvuruyu silmek / reddetmek istediğinize emin misiniz?")) return;
+      let list = getData(key);
+      list = list.filter(x => x.id !== id);
+      setData(key, list);
+      showToast("Başvuru silindi.");
       loadDashboardData();
     }
 
     function deleteLiveItem(key, id) {
       if (!confirm("Bu kaydı yayından kaldırmak istediğinize emin misiniz?")) return;
-      setData(key, getData(key).filter(s => s.id !== id));
+      let list = getData(key);
+      list = list.filter(x => x.id !== id);
+      setData(key, list);
       showToast("Kayıt yayından kaldırıldı.");
       loadDashboardData();
     }
@@ -515,41 +593,39 @@
     function handleChangePassword(e) {
       e.preventDefault();
       const newPass = document.getElementById('newAdminPassword').value.trim();
-      if (newPass.length < 4) { alert("Şifre en az 4 karakter olmalıdır!"); return; }
+      if (!newPass) return;
       localStorage.setItem('turkmc_admin_password', newPass);
       document.getElementById('newAdminPassword').value = '';
-      showToast("🔑 Yönetici şifreniz güncellendi!");
+      showToast("✓ Şifreniz başarıyla güncellendi!");
     }
 
     function exportDataJson() {
-      const data = {
+      const allData = {
         servers: getData('turkmc_approved_servers'),
-        pending_servers: getData('turkmc_pending_servers'),
         clans: getData('turkmc_approved_clans'),
-        pending_clans: getData('turkmc_pending_clans'),
         tierlist: getData('turkmc_approved_tierlist'),
-        pending_tierlist: getData('turkmc_pending_tierlist'),
-        exportedAt: new Date().toISOString()
+        packs: getData('turkmc_approved_packs')
       };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `turkmc_topluluk_yedek_${Date.now()}.json`;
+      a.download = `turkmc-yedek-${Date.now()}.json`;
       a.click();
-      URL.revokeObjectURL(url);
     }
 
     function clearAllData() {
-      if (!confirm("Tüm verileri silmek istediğinize emin misiniz?")) return;
+      if (!confirm("DİKKAT! Tüm yayınlanan ve bekleyen kayıtlar silinecek. Emin misiniz?")) return;
       localStorage.removeItem('turkmc_approved_servers');
       localStorage.removeItem('turkmc_pending_servers');
       localStorage.removeItem('turkmc_approved_clans');
       localStorage.removeItem('turkmc_pending_clans');
       localStorage.removeItem('turkmc_approved_tierlist');
       localStorage.removeItem('turkmc_pending_tierlist');
-      loadDashboardData();
+      localStorage.removeItem('turkmc_approved_packs');
+      localStorage.removeItem('turkmc_pending_packs');
       showToast("Tüm veriler sıfırlandı.");
+      loadDashboardData();
     }
 
     function showToast(msg) {
@@ -560,7 +636,9 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      if (sessionStorage.getItem('turkmc_admin_logged_in') === 'true') showDashboard();
+      if (sessionStorage.getItem('turkmc_admin_logged_in') === 'true') {
+        showDashboard();
+      }
     });
   </script>
 </body>
