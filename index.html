@@ -12,9 +12,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   
   <style>
-    /* ==========================================================================
-       TÜRKMC Temel Tasarım Sistemi & Cam Efektleri
-       ========================================================================== */
     :root {
       --primary-gold: #f59e0b;
       --primary-gold-hover: #fbbf24;
@@ -48,7 +45,7 @@
       position: fixed;
       inset: 0;
       background: 
-        linear-gradient(180deg, rgba(10, 13, 20, 0.78) 0%, rgba(10, 13, 20, 0.92) 55%, #0a0d14 100%),
+        linear-gradient(180deg, rgba(10, 13, 20, 0.8) 0%, rgba(10, 13, 20, 0.92) 55%, #0a0d14 100%),
         url('background.png') center center / cover no-repeat,
         url('https://images.unsplash.com/photo-1627856013091-fed6e4e30025?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat;
       z-index: -2;
@@ -72,7 +69,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(10, 13, 20, 0.85);
+      background: rgba(10, 13, 20, 0.88);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.07);
@@ -317,7 +314,7 @@
       color: #64748b;
     }
 
-    /* Kategori Butonları (Yatay Kaydırma) */
+    /* Kategori Butonları */
     .categories-wrap {
       max-width: 1400px;
       margin: 2.2rem auto 2.5rem;
@@ -360,7 +357,7 @@
       box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
     }
 
-    /* Ana İçerik / Grid */
+    /* Ana İçerik */
     .main-content {
       max-width: 1400px;
       margin: 0 auto;
@@ -391,7 +388,7 @@
       border: 1px solid rgba(245, 158, 11, 0.3);
     }
 
-    /* Sunucu Banner Izgarası (Görsel 3 mc-tr tarzı yatay afişler) */
+    /* Sunucu Banner Izgarası */
     .server-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -538,7 +535,6 @@
       display: inline-block;
     }
 
-    /* IP & Eylem Çubuğu */
     .server-actions-bar {
       display: flex;
       align-items: center;
@@ -582,7 +578,7 @@
       color: #0f172a;
     }
 
-    /* Discord Tanıtım Alanı (Görsel 1 Alt Kısmı) */
+    /* Discord Çağrı Bloğu */
     .discord-section {
       margin-top: 4rem;
       background: linear-gradient(135deg, rgba(88, 101, 242, 0.24) 0%, rgba(15, 23, 42, 0.95) 100%);
@@ -627,7 +623,7 @@
       fill: #fff;
     }
 
-    /* Modallar (Popup Pencereleri) */
+    /* Modallar */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -687,7 +683,6 @@
       color: #ef4444;
     }
 
-    /* Sunucu Detay Modalı (Görsel 4 formatı) */
     .modal-banner-box {
       width: 100%;
       height: 200px;
@@ -771,7 +766,7 @@
       margin: 1.25rem 0;
     }
 
-    /* Form Girişleri (Sunucu Ekle) */
+    /* Form Girişleri */
     .form-group {
       margin-bottom: 1.25rem;
     }
@@ -867,7 +862,6 @@
 </head>
 <body>
 
-  <!-- Arka Plan Görseli Katmanı -->
   <div class="bg-layer"></div>
   <div class="bg-glow-layer"></div>
 
@@ -875,8 +869,7 @@
   <header class="navbar">
     <div class="nav-container">
       <a href="index.html" class="logo-brand">
-        <!-- Taç Simgesi -->
-        <svg class="crown-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="crown-icon" viewBox="0 0 24 24" fill="none">
           <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" fill="#F59E0B" stroke="#FDE047" stroke-width="1.5" stroke-linejoin="round"/>
           <path d="M5 19H19V17H5V19Z" fill="#D97706"/>
         </svg>
@@ -889,11 +882,8 @@
             <a href="index.html" class="nav-link active">Ana Sayfa</a>
           </li>
           
-          <!-- Sunucu Kategorileri Açılır Menüsü (Görsel 5) -->
           <li class="nav-item">
-            <a class="nav-link">
-              Minecraft Sunucuları ▾
-            </a>
+            <a class="nav-link">Minecraft Sunucuları ▾</a>
             <div class="dropdown-content">
               <a class="dropdown-link" onclick="filterByCategory('all')"><span><span class="cat-dot"></span>Tüm Sunucular</span></a>
               <a class="dropdown-link" onclick="filterByCategory('Hub')"><span><span class="cat-dot"></span>Hub Sunucuları</span></a>
@@ -953,7 +943,7 @@
     </div>
   </section>
 
-  <!-- Kategori Filtre Butonları (Yatay Liste) -->
+  <!-- Kategori Filtre Butonları -->
   <div class="categories-wrap">
     <div class="categories-scroll" id="categoriesScroll">
       <button class="cat-filter-btn active" data-cat="all" onclick="filterByCategory('all')">Tümü</button>
@@ -970,7 +960,7 @@
     </div>
   </div>
 
-  <!-- Ana Sunucu Vitrini / Banner Izgarası -->
+  <!-- Ana Sunucu Vitrini -->
   <main class="main-content">
     <div class="section-head">
       <h2 class="section-title">
@@ -982,12 +972,11 @@
       </button>
     </div>
 
-    <!-- Sunucu Kartları Izgarası (Görsel 3 Tarzı) -->
     <div class="server-grid" id="serverGrid">
-      <!-- JavaScript tarafından dinamik oluşturulacak -->
+      <!-- Sunucular JS tarafından yüklenecek -->
     </div>
 
-    <!-- Discord Çağrı Bloğu (Görsel 1 Alt Bölüm) -->
+    <!-- Discord Alanı -->
     <section class="discord-section">
       <div class="discord-info-left">
         <div class="discord-big-avatar">
@@ -1008,21 +997,17 @@
     </section>
   </main>
 
-  <!-- =========================================================================
-       MODAL 1: Sunucu Detay Görünümü (Görsel 4 Uyarlaması)
-       ========================================================================= -->
+  <!-- MODAL: Sunucu Detayları (Görsel 4 formatı) -->
   <div class="modal-backdrop" id="detailModal">
     <div class="modal-card">
       <button class="modal-close-icon" onclick="closeModal('detailModal')">✕</button>
       
-      <!-- Sunucu Afiş / Banner Alanı (GIF veya Fotoğraf) -->
       <div class="modal-banner-box">
-        <img id="modalBannerImg" src="" alt="Sunucu Bannerı">
+        <img id="modalBannerImg" src="" alt="Sunucu Bannerı" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'">
       </div>
 
-      <!-- Başlık ve Logo -->
       <div class="modal-detail-head">
-        <img id="modalLogoImg" src="" alt="Logo" class="modal-detail-avatar">
+        <img id="modalLogoImg" src="" alt="Logo" class="modal-detail-avatar" onerror="this.src='https://api.dicebear.com/7.x/identicon/svg?seed=turkmc'">
         <div style="flex: 1;">
           <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.25rem;">
             <h2 id="modalServerName" style="font-size: 1.6rem; font-weight: 800;">Sunucu Adı</h2>
@@ -1032,7 +1017,6 @@
         </div>
       </div>
 
-      <!-- Özellikler Tablosu (Görsel 4'teki Minecraft Sunucu Bilgileri) -->
       <div class="modal-detail-body">
         <div class="specs-grid">
           <div class="spec-card">
@@ -1041,7 +1025,7 @@
           </div>
           <div class="spec-card">
             <div class="lbl">Sunucu Sürümü</div>
-            <div class="val" id="modalVersionVal">1.20.4 - 1.21.x</div>
+            <div class="val" id="modalVersionVal">1.20 - 1.21</div>
           </div>
           <div class="spec-card">
             <div class="lbl">Sunucu Slotu / Kapasite</div>
@@ -1049,11 +1033,11 @@
           </div>
           <div class="spec-card">
             <div class="lbl">Sunucu Türü</div>
-            <div class="val" id="modalTypeVal">Survival / Emek</div>
+            <div class="val" id="modalTypeVal">Survival</div>
           </div>
           <div class="spec-card">
             <div class="lbl">Zorluk Seviyesi</div>
-            <div class="val" id="modalDifficultyVal">Orta - Emek</div>
+            <div class="val" id="modalDifficultyVal">Emek</div>
           </div>
           <div class="spec-card">
             <div class="lbl">İletişim & Discord</div>
@@ -1063,7 +1047,6 @@
           </div>
         </div>
 
-        <!-- IP Kopyalama Butonu -->
         <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
           <button class="btn btn-gold" style="flex: 1;" onclick="copyModalIp()">
             📋 Sunucu IP Adresini Kopyala (<span id="modalCopyIpText">oyna.ornekcraft.com</span>)
@@ -1073,7 +1056,6 @@
           </a>
         </div>
 
-        <!-- Detaylı Tanıtım Metni & Özellikler -->
         <h4 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff;">📖 Sunucu Tanıtımı & Özellikleri</h4>
         <div class="detail-story-box" id="modalDescription">
           Sunucu özellikleri burada yer alacaktır.
@@ -1082,9 +1064,7 @@
     </div>
   </div>
 
-  <!-- =========================================================================
-       MODAL 2: Ücretsiz Sunucu Tanıtımı Ekleme Formu
-       ========================================================================= -->
+  <!-- MODAL: Ücretsiz Sunucu Ekleme -->
   <div class="modal-backdrop" id="addModal">
     <div class="modal-card">
       <button class="modal-close-icon" onclick="closeModal('addModal')">✕</button>
@@ -1146,7 +1126,7 @@
           <div class="form-group">
             <label class="form-label">Banner / Afiş Görsel URL (GIF veya Fotoğraf) *</label>
             <input type="url" id="addBanner" class="form-control" placeholder="https://ornek.com/banner.gif veya banner.png" required>
-            <div class="form-desc-hint">Yatay görsel veya animasyonlu GIF linki giriniz (Hızlı yükleme için 468x60 veya 900x200 önerilir).</div>
+            <div class="form-desc-hint">Yatay görsel veya animasyonlu GIF linki giriniz.</div>
           </div>
 
           <div class="form-grid-2">
@@ -1156,18 +1136,18 @@
             </div>
             <div class="form-group">
               <label class="form-label">Discord Davet Linki</label>
-              <input type="url" id="addDiscord" class="form-control" placeholder="https://discord.gg/ornek">
+              <input type="url" id="addDiscord" class="form-control" placeholder="https://discord.gg/turkmc">
             </div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Kısa Slogan / Özet *</label>
-            <input type="text" id="addSlogan" class="form-control" placeholder="Örn: Türkiye'nin En Gelişmiş Emek Survival Sunucusu!" required>
+            <input type="text" id="addSlogan" class="form-control" placeholder="Örn: Türkiye'nin En Yenilikçi Emek Survival Sunucusu!" required>
           </div>
 
           <div class="form-group">
             <label class="form-label">Detaylı Tanıtım Açıklaması & Özellikler *</label>
-            <textarea id="addDescription" class="form-control" rows="4" placeholder="Sunucunuzdaki sistemler, kurallar, rütbeler ve oyun modları hakkında bilgi verin..." required></textarea>
+            <textarea id="addDescription" class="form-control" rows="4" placeholder="Sunucunuzdaki sistemler, kurallar ve oyun modları hakkında bilgi verin..." required></textarea>
           </div>
 
           <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
@@ -1184,27 +1164,22 @@
     <span>✓</span> <span id="toastMsg">İşlem başarıyla tamamlandı!</span>
   </div>
 
-  <!-- Alt Bilgi / Footer -->
   <footer class="footer">
     <div class="footer-brand">TÜRKMC</div>
     <p>Sadece Bir Sunucu Değil, Bir Aile!</p>
     <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #475569;">
-      Minecraft, Mojang AB'nin tescilli ticari markasıdır. Bu site Mojang veya Microsoft ile bağlantılı değildir.
+      Minecraft, Mojang AB'nin tescilli ticari markasıdır.
     </p>
   </footer>
 
-  <!-- =========================================================================
-       JavaScript: Sunucu Verileri, Arama, Filtreleme ve Başvuru Mantığı
-       ========================================================================= -->
   <script>
-    // Başlangıç Varsayılan Sunucu Verileri (Görsellerdeki Sunuculardan İlham Alınmıştır)
     const DEFAULT_SERVERS = [
       {
         id: "srv-1",
         name: "PurpurMC",
         ip: "oyna.purpurmc.com",
         category: "Survival",
-        version: "1.20 - 1.21",
+        version: "26.2 / 1.20 - 1.21",
         slot: "2026 Oyuncu",
         difficulty: "Emek",
         slogan: "26.2 Son Sürüm SMP - Sesli Sohbet, Özel Claim ve Ekonomi Sistemi!",
@@ -1229,7 +1204,7 @@
         discord: "https://discord.gg/turkmc",
         web: "",
         featured: true,
-        description: "RebornCraft Skyblock dünyasında kendi adanı kur, minyonlarını çalıştır ve en güçlü ada sahibi ol!\n\nÖne Çıkanlar:\n• Özel Ada Görevleri ve Seviyeleri\n• Otomatik Minyon Sistemleri\n• Haftalık Ada Sıralaması ve Ödüller\n• Hilesiz, korumalı PvP Arenası"
+        description: "RebornCraft Skyblock dünyasında kendi adanı kur, minyonlarını çalıştır ve en güçlü ada sahibi ol!\n\nÖne Çıkanlar:\n• Özel Ada Görevleri ve Seviyeleri\n• Otomatik Minyon Sistemleri\n• Haftalık Ada Sıralaması ve Ödüller"
       },
       {
         id: "srv-3",
@@ -1245,7 +1220,7 @@
         discord: "https://discord.gg/turkmc",
         web: "",
         featured: false,
-        description: "SentorCraft Towny sunucusunda ulusunu kur, sınırlarını genişlet ve diplomasi geliştir!\n\nÖzellikler:\n• 1:500 Gerçek Dünya Haritası\n• Kuşatma ve Savaş Sistemleri\n• Ulusal Ticaret ve Bankacılık\n• Kültürel Gelişim Ağaçları"
+        description: "SentorCraft Towny sunucusunda ulusunu kur, sınırlarını genişlet ve diplomasi geliştir!\n\nÖzellikler:\n• 1:500 Gerçek Dünya Haritası\n• Kuşatma ve Savaş Sistemleri\n• Ulusal Ticaret ve Bankacılık"
       },
       {
         id: "srv-4",
@@ -1261,44 +1236,11 @@
         discord: "https://discord.gg/turkmc",
         web: "",
         featured: false,
-        description: "MuzCraft Faction'da klanını topla, TNT toplarını hazırla ve düşman kalelerini fethet!\n\nÖne Çıkanlar:\n• Sıfırlanmayan Emek Klan Arenası\n• Özel Boss Zindanları\n• Koth ve Outpost Savaşları\n• Dengeli PvP ve Büyü Sistemi"
-      },
-      {
-        id: "srv-5",
-        name: "Coleras Network",
-        ip: "play.coleras.com",
-        category: "BoxMining",
-        version: "1.16.5 - 1.21",
-        slot: "500 Oyuncu",
-        difficulty: "Kolay",
-        slogan: "Yenilikçi BoxMining & Kutu Madenciliği Dünyası!",
-        banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80",
-        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=Coleras",
-        discord: "https://discord.gg/turkmc",
-        web: "",
-        featured: false,
-        description: "Kaz, geliştir, takas yap ve en güçlü madenci ekipmanlarına sahip ol!\n\nÖzellikler:\n• Hızlı Maden Yenilenmesi\n• Kutu Yükseltme ve Prestij Seviyeleri\n• Özel Zırh Setleri ve Tılsımlar"
-      },
-      {
-        id: "srv-6",
-        name: "Clastien Network",
-        ip: "play.clastiennetwork.com",
-        category: "Hub",
-        version: "1.8 - 1.21",
-        slot: "2000 Oyuncu",
-        difficulty: "Orta",
-        slogan: "BedWars, SkyWars, Survival ve Dahası Tek Bir Çatı Altında!",
-        banner: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=800&q=80",
-        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=Clastien",
-        discord: "https://discord.gg/turkmc",
-        web: "",
-        featured: false,
-        description: "Türkiye'nin en hızlı bağlantısına sahip minigames ve hub ağı.\n\nİçerikler:\n• Özel Kozmetikler ve Kanatlar\n• BedWars 1v1, 2v2, 4v4 Arenaları\n• Düzenli Ödüllü Turnuvalar"
+        description: "MuzCraft Faction'da klanını topla, TNT toplarını hazırla ve düşman kalelerini fethet!\n\nÖne Çıkanlar:\n• Sıfırlanmayan Emek Klan Arenası\n• Özel Boss Zindanları\n• Koth ve Outpost Savaşları"
       }
     ];
 
-    // LocalStorage veya Worker API üzerinden sunucuları al
-    function getStoredServers() {
+    function getInitialServers() {
       const saved = localStorage.getItem('turkmc_approved_servers');
       if (saved) {
         try {
@@ -1309,12 +1251,28 @@
       return DEFAULT_SERVERS;
     }
 
-    let allServers = getStoredServers();
+    let allServers = getInitialServers();
     let currentCategory = 'all';
     let currentSearchTerm = '';
     let currentSelectedServer = null;
 
-    // Sunucuları Ekrana Yazdır
+    // Cloudflare Workers API Senkronizasyonu (Varsa API'den Çeker)
+    async function syncWithServer() {
+      try {
+        const res = await fetch('/api/servers');
+        if (res.ok) {
+          const remoteServers = await res.json();
+          if (Array.isArray(remoteServers) && remoteServers.length > 0) {
+            allServers = remoteServers;
+            localStorage.setItem('turkmc_approved_servers', JSON.stringify(allServers));
+            renderServers();
+          }
+        }
+      } catch (err) {
+        // Yerel çalışma veya API yoksa localStorage ile sorunsuz devam eder
+      }
+    }
+
     function renderServers() {
       const grid = document.getElementById('serverGrid');
       const countBadge = document.getElementById('serverCountBadge');
@@ -1326,7 +1284,7 @@
           srv.name.toLowerCase().includes(term) || 
           srv.ip.toLowerCase().includes(term) || 
           srv.category.toLowerCase().includes(term) ||
-          srv.slogan.toLowerCase().includes(term);
+          (srv.slogan && srv.slogan.toLowerCase().includes(term));
         return matchesCategory && matchesSearch;
       });
 
@@ -1356,7 +1314,7 @@
           <div class="server-content">
             <div class="server-header-info">
               <div class="server-identity">
-                <img src="${srv.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + srv.name}" alt="${srv.name} Logo" class="server-logo">
+                <img src="${srv.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + srv.name}" alt="${srv.name} Logo" class="server-logo" onerror="this.src='https://api.dicebear.com/7.x/identicon/svg?seed=mc'">
                 <div>
                   <h3 class="server-title">${srv.name}</h3>
                   <div style="font-size: 0.8rem; color: #94a3b8;">${srv.slogan || ''}</div>
@@ -1388,7 +1346,6 @@
       `).join('');
     }
 
-    // Kategoriye Göre Filtreleme
     function filterByCategory(cat) {
       currentCategory = cat;
       document.querySelectorAll('.cat-filter-btn').forEach(btn => {
@@ -1401,13 +1358,11 @@
       renderServers();
     }
 
-    // Arama Çubuğu
     function handleSearch() {
       currentSearchTerm = document.getElementById('searchInput').value;
       renderServers();
     }
 
-    // IP Kopyalama ve Toast Gösterimi
     function copyIp(ip) {
       navigator.clipboard.writeText(ip).then(() => {
         showToast(`"${ip}" panoya kopyalandı!`);
@@ -1426,7 +1381,6 @@
       }, 3000);
     }
 
-    // Sunucu Detay Modalı (Görsel 4)
     function openDetailModal(id) {
       const server = allServers.find(s => s.id === id);
       if (!server) return;
@@ -1464,7 +1418,6 @@
       }
 
       document.getElementById('modalDescription').textContent = server.description || 'Detaylı tanıtım metni bulunmuyor.';
-
       document.getElementById('detailModal').classList.add('active');
     }
 
@@ -1474,7 +1427,6 @@
       }
     }
 
-    // Sunucu Ekleme Modalı
     function openAddModal() {
       document.getElementById('addModal').classList.add('active');
     }
@@ -1483,8 +1435,7 @@
       document.getElementById(modalId).classList.remove('active');
     }
 
-    // Kullanıcı Sunucu Başvurusu Gönderdiğinde
-    function handleServerSubmit(e) {
+    async function handleServerSubmit(e) {
       e.preventDefault();
 
       const newApplication = {
@@ -1504,7 +1455,7 @@
         status: 'pending'
       };
 
-      // Bekleyen başvurulara kaydet (Admin panelinde onaylanacak!)
+      // 1. Yerel Depoya Kaydet
       let pendingList = [];
       const savedPending = localStorage.getItem('turkmc_pending_servers');
       if (savedPending) {
@@ -1513,23 +1464,29 @@
       pendingList.push(newApplication);
       localStorage.setItem('turkmc_pending_servers', JSON.stringify(pendingList));
 
-      // Formu sıfırla ve kapat
+      // 2. Cloudflare API'ye Gönder (Varsa)
+      try {
+        await fetch('/api/servers/apply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newApplication)
+        });
+      } catch (err) {}
+
       document.getElementById('addServerForm').reset();
       closeModal('addModal');
-
       showToast("🎉 Başvurunuz alındı! Yönetici onayından sonra yayınlanacaktır.");
     }
 
-    // Modal dışına tıklandığında kapatma
     window.onclick = function(e) {
       if (e.target.classList.contains('modal-backdrop')) {
         e.target.classList.remove('active');
       }
     };
 
-    // Sayfa Açıldığında Başlat
     window.addEventListener('DOMContentLoaded', () => {
       renderServers();
+      syncWithServer();
     });
   </script>
 </body>
