@@ -3,105 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TÜRKMC - Minecraft Sunucuları, Klanlar & Tierlist Portalı</title>
-  <meta name="description" content="Türkiye'nin en aktif Minecraft platformu. Sunucular, klanlar ve tierlist sunucularını keşfet, canlı oyuncu sayılarını gör ve ücretsiz tanıt!">
+  <title>TÜRKMC - Minecraft Sunucuları, Klanlar, Tierlist & Mağaza</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary-gold: #f59e0b; --primary-gold-hover: #fbbf24; --gold-glow: rgba(245, 158, 11, 0.4);
-      --bg-dark: #0a0d14; --card-bg: rgba(15, 23, 42, 0.85); --card-border: rgba(255, 255, 255, 0.08);
-      --text-main: #f8fafc; --text-muted: #94a3b8; --discord-blurple: #5865F2; --discord-hover: #4752c4;
+      --primary-gold: #f59e0b; --gold-glow: rgba(245, 158, 11, 0.4); --bg-dark: #0a0d14;
+      --card-bg: rgba(15, 23, 42, 0.85); --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc; --text-muted: #94a3b8; --discord-blurple: #5865F2;
       --clan-purple: #a855f7; --tier-rose: #f43f5e;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; overflow-x: hidden; position: relative; }
-    .bg-layer { position: fixed; inset: 0; background: linear-gradient(180deg, rgba(10, 13, 20, 0.72) 0%, rgba(10, 13, 20, 0.92) 55%, #0a0d14 100%), url('background.png') center center / cover no-repeat; z-index: -2; pointer-events: none; }
-    .bg-glow-layer { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); width: 1100px; height: 600px; background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(6, 182, 212, 0.06) 50%, transparent 75%); z-index: -1; pointer-events: none; }
-    .navbar { position: sticky; top: 0; z-index: 100; background: rgba(10, 13, 20, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-dark); color: var(--text-main); min-height: 100vh; overflow-x: hidden; position: relative; }
+    .bg-layer { position: fixed; inset: 0; background: linear-gradient(180deg, rgba(10,13,20,0.72) 0%, rgba(10,13,20,0.92) 55%, #0a0d14 100%), url('background.png') center/cover no-repeat; z-index: -2; pointer-events: none; }
+    .bg-glow-layer { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); width: 1100px; height: 600px; background: radial-gradient(circle, rgba(245,158,11,0.18) 0%, rgba(6,182,212,0.06) 50%, transparent 75%); z-index: -1; pointer-events: none; }
+    .navbar { position: sticky; top: 0; z-index: 100; background: rgba(10,13,20,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.07); }
     .nav-container { max-width: 1400px; margin: 0 auto; padding: 0.85rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
     .logo-brand { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; cursor: pointer; }
     .crown-icon { width: 32px; height: 32px; filter: drop-shadow(0 2px 8px var(--gold-glow)); }
     .brand-text { font-family: 'Cinzel', serif; font-size: 1.55rem; font-weight: 900; background: linear-gradient(135deg, #fde047 0%, #f59e0b 60%, #d97706 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .nav-menu { display: flex; align-items: center; gap: 0.4rem; list-style: none; }
-    .nav-link { color: #cbd5e1; text-decoration: none; font-size: 0.9rem; font-weight: 600; padding: 0.5rem 0.85rem; border-radius: 8px; transition: all 0.2s; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; }
-    .nav-link:hover, .nav-link.active { color: #fff; background: rgba(255, 255, 255, 0.08); }
+    .nav-menu { display: flex; align-items: center; gap: 0.3rem; list-style: none; flex-wrap: wrap; }
+    .nav-link { color: #cbd5e1; text-decoration: none; font-size: 0.88rem; font-weight: 600; padding: 0.45rem 0.75rem; border-radius: 8px; transition: 0.2s; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; }
+    .nav-link:hover, .nav-link.active { color: #fff; background: rgba(255,255,255,0.08); }
     .nav-link.active { color: #fbbf24; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.55rem 1.15rem; font-size: 0.88rem; font-weight: 700; border-radius: 10px; text-decoration: none; cursor: pointer; border: none; transition: all 0.2s ease; }
-    .btn-gold { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #0f172a; box-shadow: 0 4px 14px var(--gold-glow); }
-    .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.55); }
-    .btn-purple { background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%); color: #fff; box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35); }
-    .btn-purple:hover { transform: translateY(-2px); }
-    .btn-rose { background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%); color: #fff; box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35); }
-    .btn-rose:hover { transform: translateY(-2px); }
-    .btn-discord { background: var(--discord-blurple); color: #fff; box-shadow: 0 4px 14px rgba(88, 101, 242, 0.35); }
-    .btn-discord:hover { background: var(--discord-hover); transform: translateY(-2px); }
-    .btn-ghost { background: rgba(255, 255, 255, 0.06); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.1); }
-    .btn-ghost:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
-    .hero-section { text-align: center; padding: 3rem 1.5rem 1.5rem; max-width: 1050px; margin: 0 auto; }
-    .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 1rem; border-radius: 100px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); color: #fbbf24; font-size: 0.82rem; font-weight: 700; margin-bottom: 1rem; }
-    .hero-title { font-size: 2.8rem; font-weight: 900; line-height: 1.18; margin-bottom: 0.75rem; }
-    .hero-title span { background: linear-gradient(135deg, #fde047 0%, #f59e0b 60%, #f97316 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .hero-subtitle { font-size: 1.05rem; color: var(--text-muted); max-width: 720px; margin: 0 auto 1.5rem; }
-    .view-switcher-bar { display: flex; justify-content: center; gap: 0.75rem; margin: 0 auto 1.5rem; max-width: 750px; flex-wrap: wrap; }
-    .view-btn { padding: 0.7rem 1.35rem; border-radius: 12px; font-size: 0.92rem; font-weight: 750; cursor: pointer; display: inline-flex; align-items: center; gap: 0.55rem; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(15, 23, 42, 0.75); color: #cbd5e1; backdrop-filter: blur(12px); transition: all 0.2s; }
-    .view-btn:hover { color: #fff; transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.25); }
-    .view-btn.active[data-view="servers"] { background: rgba(245, 158, 11, 0.18); border-color: var(--primary-gold); color: #fbbf24; box-shadow: 0 0 20px rgba(245, 158, 11, 0.25); }
-    .view-btn.active[data-view="clans"] { background: rgba(168, 85, 247, 0.18); border-color: var(--clan-purple); color: #c084fc; box-shadow: 0 0 20px rgba(168, 85, 247, 0.25); }
-    .view-btn.active[data-view="tierlist"] { background: rgba(244, 63, 94, 0.18); border-color: var(--tier-rose); color: #fb7185; box-shadow: 0 0 20px rgba(244, 63, 94, 0.25); }
-    .search-box { display: flex; align-items: center; gap: 0.6rem; max-width: 650px; margin: 0 auto 1.5rem; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); padding: 0.4rem 0.5rem 0.4rem 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); }
-    .search-input { flex: 1; background: transparent; border: none; color: #fff; font-size: 0.92rem; outline: none; font-family: inherit; }
-    .search-input::placeholder { color: #64748b; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.55rem 1.15rem; font-size: 0.88rem; font-weight: 700; border-radius: 10px; text-decoration: none; cursor: pointer; border: none; transition: 0.2s; }
+    .btn-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; box-shadow: 0 4px 14px var(--gold-glow); }
+    .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,0.55); }
+    .btn-purple { background: linear-gradient(135deg, #c084fc, #a855f7); color: #fff; }
+    .btn-rose { background: linear-gradient(135deg, #fb7185, #f43f5e); color: #fff; }
+    .btn-discord { background: var(--discord-blurple); color: #fff; box-shadow: 0 4px 14px rgba(88,101,242,0.35); }
+    .btn-ghost { background: rgba(255,255,255,0.06); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); }
+    .hero-section { text-align: center; padding: 2.8rem 1.5rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 1rem; border-radius: 100px; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); color: #fbbf24; font-size: 0.82rem; font-weight: 700; margin-bottom: 1rem; }
+    .hero-title { font-size: 2.7rem; font-weight: 900; line-height: 1.18; margin-bottom: 0.75rem; }
+    .hero-title span { background: linear-gradient(135deg, #fde047, #f59e0b, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-subtitle { font-size: 1.05rem; color: var(--text-muted); max-width: 760px; margin: 0 auto 1.5rem; }
+    .view-switcher-bar { display: flex; justify-content: center; gap: 0.65rem; margin: 0 auto 1.5rem; max-width: 920px; flex-wrap: wrap; }
+    .view-btn { padding: 0.65rem 1.15rem; border-radius: 12px; font-size: 0.9rem; font-weight: 750; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(15,23,42,0.75); color: #cbd5e1; backdrop-filter: blur(12px); transition: 0.2s; }
+    .view-btn:hover { color: #fff; transform: translateY(-2px); }
+    .view-btn.active[data-view="servers"] { background: rgba(245,158,11,0.18); border-color: var(--primary-gold); color: #fbbf24; }
+    .view-btn.active[data-view="clans"] { background: rgba(168,85,247,0.18); border-color: var(--clan-purple); color: #c084fc; }
+    .view-btn.active[data-view="tierlist"] { background: rgba(244,63,94,0.18); border-color: var(--tier-rose); color: #fb7185; }
+    .view-btn.active[data-view="community"] { background: rgba(88,101,242,0.22); border-color: var(--discord-blurple); color: #818cf8; }
+    .view-btn.active[data-view="store"] { background: rgba(16,185,129,0.2); border-color: #10b981; color: #34d399; }
+    .search-box { display: flex; align-items: center; gap: 0.6rem; max-width: 650px; margin: 0 auto 1.5rem; background: rgba(15,23,42,0.85); backdrop-filter: blur(20px); padding: 0.4rem 0.5rem 0.4rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); }
+    .search-input { flex: 1; background: transparent; border: none; color: #fff; font-size: 0.92rem; outline: none; }
     .subcat-bar { display: flex; align-items: center; justify-content: center; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 2rem; }
-    .cat-filter-btn { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 0.4rem 0.85rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .cat-filter-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
-    .cat-filter-btn.active { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #fbbf24; }
+    .cat-filter-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; padding: 0.4rem 0.85rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .cat-filter-btn.active { background: rgba(245,158,11,0.15); border-color: #f59e0b; color: #fbbf24; }
     .main-container { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem 5rem; }
     .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
     .section-title { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 0.6rem; }
-    .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+    .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
     @media (max-width: 640px) { .items-grid { grid-template-columns: 1fr; } }
-    .item-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; backdrop-filter: blur(16px); transition: all 0.25s ease; cursor: pointer; display: flex; flex-direction: column; }
-    .item-card:hover { transform: translateY(-4px); border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 158, 11, 0.15); }
+    .item-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; backdrop-filter: blur(16px); transition: 0.25s; cursor: pointer; display: flex; flex-direction: column; }
+    .item-card:hover { transform: translateY(-4px); border-color: rgba(245,158,11,0.4); box-shadow: 0 12px 30px rgba(0,0,0,0.6); }
     .card-banner-box { position: relative; height: 140px; background: #020617; overflow: hidden; }
-    .card-banner-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
-    .item-card:hover .card-banner-img { transform: scale(1.05); }
-    .card-banner-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(15, 23, 42, 0.85) 100%); }
+    .card-banner-img { width: 100%; height: 100%; object-fit: cover; }
+    .card-banner-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(15,23,42,0.85) 100%); }
     .card-content-body { padding: 1.25rem; display: flex; flex-direction: column; flex: 1; }
     .card-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.75rem; }
     .card-identity { display: flex; align-items: center; gap: 0.75rem; }
-    .card-logo { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.12); flex-shrink: 0; }
-    .card-title { font-size: 1.15rem; font-weight: 800; color: #fff; line-height: 1.2; }
-    .card-category-badge { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 6px; white-space: nowrap; }
+    .card-logo { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; background: #1e293b; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0; }
+    .card-title { font-size: 1.15rem; font-weight: 800; color: #fff; }
+    .card-category-badge { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: #fbbf24; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 6px; white-space: nowrap; }
     .card-tags { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 1rem; }
-    .tag-pill { font-size: 0.78rem; font-weight: 600; color: #94a3b8; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.06); padding: 0.2rem 0.6rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.3rem; }
+    .tag-pill { font-size: 0.78rem; font-weight: 600; color: #94a3b8; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06); padding: 0.2rem 0.6rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.3rem; }
     .status-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; animation: pulseDot 2s infinite; display: inline-block; }
     .status-offline-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block; }
-    @keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
-    .card-bottom-bar { margin-top: auto; padding-top: 0.85rem; border-top: 1px solid rgba(255, 255, 255, 0.06); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
-    .card-ip-code { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: #fbbf24; background: rgba(0, 0, 0, 0.35); padding: 0.3rem 0.65rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.06); }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
+    @keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .card-bottom-bar { margin-top: auto; padding-top: 0.85rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .card-ip-code { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: #fbbf24; background: rgba(0,0,0,0.35); padding: 0.3rem 0.65rem; border-radius: 6px; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
     .modal-backdrop.active { display: flex; }
-    .modal-box { background: rgba(15, 23, 42, 0.96); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 20px; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8); }
-    .modal-close-btn { position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: all 0.2s; }
+    .modal-box { background: rgba(15,23,42,0.96); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; }
+    .modal-close-btn { position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .modal-close-btn:hover { background: #ef4444; color: #fff; }
     .form-group { margin-bottom: 1.15rem; }
     .form-label { display: block; font-size: 0.82rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.35rem; }
-    .form-control { width: 100%; padding: 0.65rem 0.9rem; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-family: inherit; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
-    .form-control:focus { border-color: var(--primary-gold); background: rgba(255, 255, 255, 0.07); }
+    .form-control { width: 100%; padding: 0.65rem 0.9rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 0.9rem; outline: none; }
+    .form-control:focus { border-color: var(--primary-gold); }
     .form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
     @media (max-width: 600px) { .form-grid-2 { grid-template-columns: 1fr; } }
     .specs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1rem 0; }
     @media (max-width: 600px) { .specs-grid { grid-template-columns: 1fr; } }
-    .spec-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 0.75rem 0.9rem; }
+    .spec-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 0.75rem 0.9rem; }
     .spec-card .lbl { font-size: 0.72rem; color: #64748b; text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem; }
     .spec-card .val { font-size: 0.92rem; font-weight: 700; color: #f1f5f9; }
-    .discord-section { margin-top: 3.5rem; background: linear-gradient(135deg, rgba(88, 101, 242, 0.24) 0%, rgba(15, 23, 42, 0.95) 100%); border: 1px solid rgba(88, 101, 242, 0.4); border-radius: 18px; padding: 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); }
+    .discord-section { margin-top: 3.5rem; background: linear-gradient(135deg, rgba(88,101,242,0.24) 0%, rgba(15,23,42,0.95) 100%); border: 1px solid rgba(88,101,242,0.4); border-radius: 18px; padding: 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
     @media (max-width: 768px) { .discord-section { flex-direction: column; text-align: center; } }
-    .toast-box { position: fixed; bottom: 2rem; right: 2rem; background: #10b981; color: #fff; padding: 0.75rem 1.25rem; border-radius: 10px; font-weight: 700; font-size: 0.88rem; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35); z-index: 999; transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .toast-box { position: fixed; bottom: 2rem; right: 2rem; background: #10b981; color: #fff; padding: 0.75rem 1.25rem; border-radius: 10px; font-weight: 700; font-size: 0.88rem; z-index: 999; transform: translateY(100px); opacity: 0; transition: 0.3s; }
     .toast-box.show { transform: translateY(0); opacity: 1; }
-    .footer { border-top: 1px solid rgba(255, 255, 255, 0.06); background: #07090e; padding: 2rem 1.5rem; text-align: center; color: #64748b; font-size: 0.85rem; }
+    .footer { border-top: 1px solid rgba(255,255,255,0.06); background: #07090e; padding: 2rem 1.5rem; text-align: center; color: #64748b; font-size: 0.85rem; }
+    .community-box { background: rgba(15,23,42,0.85); border: 1px solid rgba(88,101,242,0.35); border-radius: 20px; padding: 2.2rem 1.8rem; backdrop-filter: blur(16px); }
+    .line-divider { width: 100%; max-width: 600px; display: block; margin: 1.2rem auto; border-radius: 4px; }
+    .community-feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+    .c-feature-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 1rem; display: flex; align-items: flex-start; gap: 0.85rem; }
+    .c-feature-icon { font-size: 1.5rem; background: rgba(88,101,242,0.15); padding: 0.45rem; border-radius: 10px; }
+    .partner-card { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 14px; padding: 1.2rem; margin-top: 1.5rem; }
+    .store-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; margin-top: 1rem; }
+    .store-card { background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.09); border-radius: 18px; padding: 1.8rem 1.3rem; display: flex; flex-direction: column; text-align: center; position: relative; transition: 0.25s; cursor: pointer; }
+    .store-card:hover { transform: translateY(-5px); box-shadow: 0 16px 35px rgba(0,0,0,0.6); }
+    .store-card.copper { border-color: rgba(217,119,6,0.5); }
+    .store-card.iron { border-color: rgba(148,163,184,0.5); }
+    .store-card.gold { border-color: rgba(245,158,11,0.6); background: linear-gradient(180deg, rgba(245,158,11,0.08), rgba(15,23,42,0.95)); }
+    .store-card.diamond { border-color: rgba(6,182,212,0.6); background: linear-gradient(180deg, rgba(6,182,212,0.08), rgba(15,23,42,0.95)); }
+    .store-badge { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.75rem; border-radius: 100px; text-transform: uppercase; }
+    .store-price { font-size: 2.3rem; font-weight: 900; color: #fff; margin: 0.8rem 0 0.4rem; }
+    .store-features-list { list-style: none; text-align: left; margin: 1.2rem 0; font-size: 0.85rem; color: #94a3b8; line-height: 1.75; }
+    .store-features-list li::before { content: "✓ "; color: #10b981; font-weight: 800; }
   </style>
 </head>
 <body>
@@ -124,12 +135,12 @@
         <li><a class="nav-link active" id="navLinkServers" onclick="switchMainView('servers')">🎮 Sunucular</a></li>
         <li><a class="nav-link" id="navLinkClans" onclick="switchMainView('clans')">⚔️ Klanlar</a></li>
         <li><a class="nav-link" id="navLinkTierlist" onclick="switchMainView('tierlist')">🏆 Tierlist</a></li>
+        <li><a class="nav-link" id="navLinkCommunity" onclick="switchMainView('community')">🤝 Topluluk</a></li>
+        <li><a class="nav-link" id="navLinkStore" onclick="switchMainView('store')">🛒 Mağaza</a></li>
         <li><a href="admin.html" class="nav-link" style="color: #fbbf24;">👑 Yönetim</a></li>
       </ul>
 
-      <a href="https://discord.gg/turkmc" target="_blank" class="btn btn-discord">
-        Discord'a Katıl ➔
-      </a>
+      <a href="https://discord.gg/turkmc" target="_blank" class="btn btn-discord">Discord'a Katıl ➔</a>
     </div>
   </header>
 
@@ -139,15 +150,17 @@
     <h1 class="hero-title" id="heroDynamicTitle">En İyi Minecraft Sunucuları <span>TÜRKMC</span>'de!</h1>
     <p class="hero-subtitle" id="heroDynamicSubtitle">Binlerce Türk oyuncunun buluştuğu nokta. Kendi Minecraft sunucunu ücretsiz tanıt veya canlı oyuncu sayılarını görerek hemen katıl!</p>
 
-    <!-- 3 Ana Kategori Seçicisi -->
+    <!-- 5 Ana Kategori Seçicisi -->
     <div class="view-switcher-bar">
       <button class="view-btn active" data-view="servers" onclick="switchMainView('servers')">🎮 Minecraft Sunucuları</button>
       <button class="view-btn" data-view="clans" onclick="switchMainView('clans')">⚔️ Klan Sunucuları</button>
       <button class="view-btn" data-view="tierlist" onclick="switchMainView('tierlist')">🏆 Tierlist Sunucuları</button>
+      <button class="view-btn" data-view="community" onclick="switchMainView('community')">🤝 Topluluk & Partner</button>
+      <button class="view-btn" data-view="store" onclick="switchMainView('store')">🛒 Reklam Mağazası</button>
     </div>
 
     <!-- Arama Çubuğu -->
-    <div class="search-box">
+    <div class="search-box" id="searchBoxWrap">
       <span style="font-size: 1.1rem; color: #64748b;">🔍</span>
       <input type="text" id="searchInput" class="search-input" placeholder="Sunucu adı, IP adresi veya mod ara..." oninput="handleSearch()">
       <div id="dynamicAddButtonContainer">
@@ -155,7 +168,7 @@
       </div>
     </div>
 
-    <!-- Minecraft Alt Kategorileri -->
+    <!-- Alt Kategoriler -->
     <div class="subcat-bar" id="serversSubCategoriesWrap">
       <button class="cat-filter-btn active" data-cat="all" onclick="filterByCategory('all')">Tümü</button>
       <button class="cat-filter-btn" data-cat="Survival" onclick="filterByCategory('Survival')">Survival</button>
@@ -169,16 +182,17 @@
     </div>
   </section>
 
-  <!-- İçerik Vitrini -->
+  <!-- İçerik Alanı -->
   <main class="main-container">
-    <div class="section-head">
+    <div class="section-head" id="sectionHeadWrap">
       <h2 class="section-title">
         <span id="sectionTitleIcon">🎮</span>
         <span id="sectionTitleText">Minecraft Sunucu Vitrini</span>
       </h2>
       <span style="font-size: 0.85rem; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 0.35rem 0.8rem; border-radius: 8px;" id="itemCountBadge">0 Kayıt</span>
     </div>
-    <div class="items-grid" id="showcaseGrid"></div>
+
+    <div id="showcaseArea"></div>
 
     <section class="discord-section">
       <div>
@@ -237,7 +251,7 @@
           <div class="form-group"><label class="form-label">Minecraft Sürümü *</label><input type="text" id="srvVersion" class="form-control" placeholder="Örn: 1.16 - 1.21" required></div>
         </div>
         <div class="form-grid-2">
-          <div class="form-group"><label class="form-label">Banner / Afiş URL</label><input type="url" id="srvBanner" class="form-control" placeholder="https://... afiş görseli"></div>
+          <div class="form-group"><label class="form-label">Banner / Afiş URL</label><input type="url" id="srvBanner" class="form-control" placeholder="https://... afiş"></div>
           <div class="form-group"><label class="form-label">Logo URL (Boşsa IP'den otomatik çekilir)</label><input type="url" id="srvLogo" class="form-control" placeholder="https://... logo"></div>
         </div>
         <div class="form-grid-2">
@@ -255,7 +269,7 @@
     <div class="modal-box">
       <button class="modal-close-btn" onclick="closeModal('addClanModal')">✕</button>
       <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.3rem;">⚔️ Klan Topluluğu Ekle</h3>
-      <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.25rem;">Klanını ve ekibini tanıt, yeni oyuncular kazan ve gücünü göster!</p>
+      <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.25rem;">Klanını tanıt, yeni savaşçılar kazan ve gücünü göster!</p>
       <form onsubmit="handleSubmitClan(event)">
         <div class="form-grid-2">
           <div class="form-group"><label class="form-label">Klan Adı *</label><input type="text" id="clanName" class="form-control" placeholder="Örn: Osmanlı Ordusu" required></div>
@@ -266,7 +280,7 @@
           <div class="form-group"><label class="form-label">Aktif Üye Sayısı *</label><input type="text" id="clanMembers" class="form-control" placeholder="Örn: 25+ Üye" required></div>
         </div>
         <div class="form-grid-2">
-          <div class="form-group"><label class="form-label">Oynadıkları Oyun Modu *</label><input type="text" id="clanGamemode" class="form-control" placeholder="Örn: BoxPvP & Faction" required></div>
+          <div class="form-group"><label class="form-label">Oyun Modu *</label><input type="text" id="clanGamemode" class="form-control" placeholder="Örn: BoxPvP & Faction" required></div>
           <div class="form-group"><label class="form-label">Klan Discord Linki *</label><input type="url" id="clanDiscord" class="form-control" placeholder="https://discord.gg/..." required></div>
         </div>
         <div class="form-grid-2">
@@ -290,10 +304,8 @@
           <div class="form-group"><label class="form-label">Sunucu / Tierlist Adı *</label><input type="text" id="tierName" class="form-control" placeholder="Örn: Turkey Sword Tierlist" required></div>
           <div class="form-group"><label class="form-label">Tierlist Kategorisi *</label>
             <select id="tierCategory" class="form-control" required>
-              <option value="Sword PvP">Sword PvP (Kılıç)</option>
-              <option value="Crystal PvP">Crystal PvP (Kristal)</option>
-              <option value="SMP Tierlist">SMP Tierlist</option>
-              <option value="Genel PvP">Genel PvP Derecelendirme</option>
+              <option value="Sword PvP">Sword PvP (Kılıç)</option><option value="Crystal PvP">Crystal PvP (Kristal)</option>
+              <option value="SMP Tierlist">SMP Tierlist</option><option value="Genel PvP">Genel PvP Derecelendirme</option>
               <option value="UHC & Pot">UHC / Pot PvP</option>
             </select>
           </div>
@@ -317,13 +329,11 @@
   <footer class="footer">
     <div style="font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 900; color: #fbbf24; margin-bottom: 0.4rem;">TÜRKMC</div>
     <p>Sadece Bir Sunucu Değil, Bir Aile!</p>
-    <p style="margin-top: 0.35rem; font-size: 0.8rem; color: #475569;">Minecraft Sunucuları, Klanlar ve Tierlist Platformu</p>
+    <p style="margin-top: 0.35rem; font-size: 0.8rem; color: #475569;">Minecraft Sunucuları, Klanlar, Tierlist ve Topluluk Platformu</p>
   </footer>
 
   <script>
-    let currentMainView = 'servers';
-    let currentCategory = 'all';
-    let currentSearchTerm = '';
+    let currentMainView = 'servers', currentCategory = 'all', currentSearchTerm = '';
 
     function getStoredData(key) {
       const saved = localStorage.getItem(key);
@@ -338,39 +348,50 @@
     function switchMainView(view) {
       currentMainView = view;
       currentSearchTerm = '';
-      document.getElementById('searchInput').value = '';
+      if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
 
       document.querySelectorAll('.view-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-view') === view));
-      document.getElementById('navLinkServers').classList.toggle('active', view === 'servers');
-      document.getElementById('navLinkClans').classList.toggle('active', view === 'clans');
-      document.getElementById('navLinkTierlist').classList.toggle('active', view === 'tierlist');
+      ['servers', 'clans', 'tierlist', 'community', 'store'].forEach(item => {
+        const el = document.getElementById('navLink' + item.charAt(0).toUpperCase() + item.slice(1));
+        if (el) el.classList.toggle('active', view === item);
+      });
 
       const titleEl = document.getElementById('heroDynamicTitle');
       const subtitleEl = document.getElementById('heroDynamicSubtitle');
       const addBtnContainer = document.getElementById('dynamicAddButtonContainer');
       const subCatWrap = document.getElementById('serversSubCategoriesWrap');
+      const searchBoxWrap = document.getElementById('searchBoxWrap');
+      const sectionHeadWrap = document.getElementById('sectionHeadWrap');
 
       if (view === 'servers') {
         titleEl.innerHTML = "En İyi Minecraft Sunucuları <span>TÜRKMC</span>'de!";
         subtitleEl.textContent = "Binlerce Türk oyuncunun buluştuğu nokta. Kendi Minecraft sunucunu ücretsiz tanıt veya canlı oyuncu sayılarını görerek hemen katıl!";
-        subCatWrap.style.display = 'flex';
+        subCatWrap.style.display = 'flex'; searchBoxWrap.style.display = 'flex'; sectionHeadWrap.style.display = 'flex';
         addBtnContainer.innerHTML = `<button class="btn btn-gold" onclick="openModal('addServerModal')">+ Sunucu Ekle (Ücretsiz)</button>`;
         document.getElementById('sectionTitleIcon').textContent = "🎮";
         document.getElementById('sectionTitleText').textContent = "Minecraft Sunucu Vitrini";
       } else if (view === 'clans') {
         titleEl.innerHTML = "Minecraft Türkiye <span>Klan Toplulukları</span>";
         subtitleEl.textContent = "Klan savaşları, Faction & BoxPvP ekipleri ve klan Discord toplulukları tek bir çatı altında!";
-        subCatWrap.style.display = 'none';
+        subCatWrap.style.display = 'none'; searchBoxWrap.style.display = 'flex'; sectionHeadWrap.style.display = 'flex';
         addBtnContainer.innerHTML = `<button class="btn btn-purple" onclick="openModal('addClanModal')">+ Klan Ekle (Ücretsiz)</button>`;
         document.getElementById('sectionTitleIcon').textContent = "⚔️";
         document.getElementById('sectionTitleText').textContent = "Klan Sunucuları & Ekipler";
       } else if (view === 'tierlist') {
         titleEl.innerHTML = "Minecraft <span>PvP & Tierlist</span> Sunucuları";
         subtitleEl.textContent = "Resmi PvP derecelendirme, Sword, Crystal ve SMP tierlist sunucularını incele ve katıl!";
-        subCatWrap.style.display = 'none';
+        subCatWrap.style.display = 'none'; searchBoxWrap.style.display = 'flex'; sectionHeadWrap.style.display = 'flex';
         addBtnContainer.innerHTML = `<button class="btn btn-rose" onclick="openModal('addTierModal')">+ Tierlist Ekle (Ücretsiz)</button>`;
         document.getElementById('sectionTitleIcon').textContent = "🏆";
         document.getElementById('sectionTitleText').textContent = "PvP & Tierlist Sunucuları";
+      } else if (view === 'community') {
+        titleEl.innerHTML = "🤝 TÜRK MINECRAFT <span>TOPLULUĞU</span>";
+        subtitleEl.textContent = "Minecraft tutkunlarının buluşma noktası! Etkinlikler, turnuvalar, kaynak paketleri ve partnerlik detayları.";
+        subCatWrap.style.display = 'none'; searchBoxWrap.style.display = 'none'; sectionHeadWrap.style.display = 'none';
+      } else if (view === 'store') {
+        titleEl.innerHTML = "TÜRKMC <span>Reklam Mağazası</span>";
+        subtitleEl.textContent = "Minecraft sunucunu veya projeni binlerce aktif oyuncuya duyur! Discord reklam paketlerimizi incele.";
+        subCatWrap.style.display = 'none'; searchBoxWrap.style.display = 'none'; sectionHeadWrap.style.display = 'none';
       }
       renderCurrentView();
     }
@@ -392,55 +413,48 @@
       const statusEl = document.getElementById(`pingStatus-${cardId}`);
       const playersEl = document.getElementById(`pingPlayers-${cardId}`);
       const logoEl = document.getElementById(`logo-${cardId}`);
-
       if (ping && ping.online) {
         if (statusEl) { statusEl.innerHTML = `<span class="status-live-dot"></span> Canlı`; statusEl.style.color = "#10b981"; }
         if (playersEl) { playersEl.textContent = `👥 ${ping.players ? ping.players.online : 0} / ${ping.players ? ping.players.max : 0} Oyuncu`; }
-        if (logoEl && ping.icon) { logoEl.src = ping.icon; }
+        if (logoEl && ping.icon) logoEl.src = ping.icon;
       } else {
         if (statusEl) { statusEl.innerHTML = `<span class="status-offline-dot"></span> Çevrimdışı`; statusEl.style.color = "#ef4444"; }
       }
     }
 
     function renderCurrentView() {
-      const grid = document.getElementById('showcaseGrid');
+      const showcase = document.getElementById('showcaseArea');
       const badge = document.getElementById('itemCountBadge');
 
       if (currentMainView === 'servers') {
         const filtered = serversList.filter(s => {
           const catMatch = (currentCategory === 'all' || s.category.toLowerCase() === currentCategory.toLowerCase());
           const term = currentSearchTerm.toLowerCase().trim();
-          const searchMatch = !term || s.name.toLowerCase().includes(term) || s.ip.toLowerCase().includes(term) || s.category.toLowerCase().includes(term);
-          return catMatch && searchMatch;
+          return catMatch && (!term || s.name.toLowerCase().includes(term) || s.ip.toLowerCase().includes(term));
         });
-
         badge.textContent = `${filtered.length} Sunucu`;
         if (filtered.length === 0) {
-          grid.innerHTML = getEmptyState("🎮", "Henüz Yayında Minecraft Sunucusu Bulunmuyor", "Topluluğumuza ilk katılan sunucu olmak için hemen ekle!", "addServerModal", "+ İlk Sen Sunucu Ekle");
+          showcase.innerHTML = getEmptyState("🎮", "Henüz Yayında Minecraft Sunucusu Bulunmuyor", "Topluluğumuza ilk katılan sunucu olmak için hemen ekle!", "addServerModal", "+ İlk Sen Sunucu Ekle");
           return;
         }
-
-        grid.innerHTML = filtered.map(s => {
+        showcase.innerHTML = `<div class="items-grid">` + filtered.map(s => {
           setTimeout(() => fetchServerPing(s.ip, s.id), 50);
           return `
             <div class="item-card" onclick="openServerDetail('${s.id}')">
               <div class="card-banner-box">
-                <img src="${s.banner || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'}" class="card-banner-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'">
+                <img src="${s.banner || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'}" class="card-banner-img">
                 <div class="card-banner-overlay"></div>
               </div>
               <div class="card-content-body">
                 <div class="card-head-row">
                   <div class="card-identity">
-                    <img id="logo-${s.id}" src="${s.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + s.name}" class="card-logo" onerror="this.src='https://api.dicebear.com/7.x/identicon/svg?seed=mc'">
-                    <div>
-                      <h3 class="card-title">${s.name}</h3>
-                      <div style="font-size: 0.8rem; color: #94a3b8;">${s.slogan || ''}</div>
-                    </div>
+                    <img id="logo-${s.id}" src="${s.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + s.name}" class="card-logo">
+                    <div><h3 class="card-title">${s.name}</h3><div style="font-size: 0.8rem; color: #94a3b8;">${s.slogan || ''}</div></div>
                   </div>
                   <span class="card-category-badge">${s.category}</span>
                 </div>
                 <div class="card-tags">
-                  <span class="tag-pill" id="pingStatus-${s.id}"><span class="status-live-dot"></span> Kontrol Ediliyor...</span>
+                  <span class="tag-pill" id="pingStatus-${s.id}"><span class="status-live-dot"></span> Kontrol...</span>
                   <span class="tag-pill" id="pingPlayers-${s.id}">👥 Kapasite: ${s.slot || '500'}</span>
                   <span class="tag-pill">🎮 ${s.version}</span>
                 </div>
@@ -454,40 +468,34 @@
               </div>
             </div>
           `;
-        }).join('');
+        }).join('') + `</div>`;
 
       } else if (currentMainView === 'clans') {
         const filtered = clansList.filter(c => {
           const term = currentSearchTerm.toLowerCase().trim();
-          return !term || c.name.toLowerCase().includes(term) || c.tag.toLowerCase().includes(term) || (c.leader && c.leader.toLowerCase().includes(term));
+          return !term || c.name.toLowerCase().includes(term) || c.tag.toLowerCase().includes(term);
         });
-
         badge.textContent = `${filtered.length} Klan`;
         if (filtered.length === 0) {
-          grid.innerHTML = getEmptyState("⚔️", "Henüz Yayında Klan Bulunmuyor", "Klanını ilk sen ekle, yeni savaşçılar kazan ve öne çık!", "addClanModal", "+ İlk Sen Klan Ekle");
+          showcase.innerHTML = getEmptyState("⚔️", "Henüz Yayında Klan Bulunmuyor", "Klanını ilk sen ekle, yeni savaşçılar kazan ve öne çık!", "addClanModal", "+ İlk Sen Klan Ekle");
           return;
         }
-
-        grid.innerHTML = filtered.map(c => `
+        showcase.innerHTML = `<div class="items-grid">` + filtered.map(c => `
           <div class="item-card" onclick="openClanDetail('${c.id}')">
             <div class="card-banner-box">
-              <img src="${c.banner || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'}" class="card-banner-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'">
+              <img src="${c.banner || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'}" class="card-banner-img">
               <div class="card-banner-overlay"></div>
             </div>
             <div class="card-content-body">
               <div class="card-head-row">
                 <div class="card-identity">
-                  <div style="width: 44px; height: 44px; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">⚔️</div>
-                  <div>
-                    <h3 class="card-title">${c.name} <span style="color: #c084fc; font-size: 0.88rem;">${c.tag}</span></h3>
-                    <div style="font-size: 0.8rem; color: #94a3b8;">${c.slogan || ''}</div>
-                  </div>
+                  <div style="width: 44px; height: 44px; background: rgba(168,85,247,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">⚔️</div>
+                  <div><h3 class="card-title">${c.name} <span style="color: #c084fc; font-size: 0.88rem;">${c.tag}</span></h3><div style="font-size: 0.8rem; color: #94a3b8;">${c.slogan || ''}</div></div>
                 </div>
-                <span class="card-category-badge" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border-color: rgba(168, 85, 247, 0.3);">${c.gamemode || 'PvP'}</span>
+                <span class="card-category-badge" style="background: rgba(168,85,247,0.15); color: #c084fc;">${c.gamemode || 'PvP'}</span>
               </div>
               <div class="card-tags">
-                <span class="tag-pill">👑 Lider: ${c.leader}</span>
-                <span class="tag-pill">👥 Üye: ${c.members}</span>
+                <span class="tag-pill">👑 Lider: ${c.leader}</span><span class="tag-pill">👥 Üye: ${c.members}</span>
               </div>
               <div class="card-bottom-bar" onclick="event.stopPropagation()">
                 <span style="font-size: 0.85rem; color: #cbd5e1;">Klan Discord</span>
@@ -495,40 +503,34 @@
               </div>
             </div>
           </div>
-        `).join('');
+        `).join('') + `</div>`;
 
       } else if (currentMainView === 'tierlist') {
         const filtered = tierList.filter(t => {
           const term = currentSearchTerm.toLowerCase().trim();
-          return !term || t.name.toLowerCase().includes(term) || t.category.toLowerCase().includes(term);
+          return !term || t.name.toLowerCase().includes(term);
         });
-
         badge.textContent = `${filtered.length} Tierlist`;
         if (filtered.length === 0) {
-          grid.innerHTML = getEmptyState("🏆", "Henüz Yayında Tierlist Sunucusu Bulunmuyor", "PvP Tierlist sunucunu ilk sen ekle ve listele!", "addTierModal", "+ İlk Sen Tierlist Ekle");
+          showcase.innerHTML = getEmptyState("🏆", "Henüz Yayında Tierlist Sunucusu Bulunmuyor", "PvP Tierlist sunucunu ilk sen ekle ve listele!", "addTierModal", "+ İlk Sen Tierlist Ekle");
           return;
         }
-
-        grid.innerHTML = filtered.map(t => `
+        showcase.innerHTML = `<div class="items-grid">` + filtered.map(t => `
           <div class="item-card" onclick="openTierDetail('${t.id}')">
             <div class="card-banner-box">
-              <img src="${t.banner || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'}" class="card-banner-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'">
+              <img src="${t.banner || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'}" class="card-banner-img">
               <div class="card-banner-overlay"></div>
             </div>
             <div class="card-content-body">
               <div class="card-head-row">
                 <div class="card-identity">
-                  <div style="width: 44px; height: 44px; background: rgba(244, 63, 94, 0.2); border: 1px solid rgba(244, 63, 94, 0.4); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">🏆</div>
-                  <div>
-                    <h3 class="card-title">${t.name}</h3>
-                    <div style="font-size: 0.8rem; color: #94a3b8;">${t.slogan || ''}</div>
-                  </div>
+                  <div style="width: 44px; height: 44px; background: rgba(244,63,94,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">🏆</div>
+                  <div><h3 class="card-title">${t.name}</h3><div style="font-size: 0.8rem; color: #94a3b8;">${t.slogan || ''}</div></div>
                 </div>
-                <span class="card-category-badge" style="background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.3);">${t.category}</span>
+                <span class="card-category-badge" style="background: rgba(244,63,94,0.15); color: #fb7185;">${t.category}</span>
               </div>
               <div class="card-tags">
-                <span class="tag-pill">👑 Yetkili: ${t.owner}</span>
-                <span class="tag-pill">⚔️ Tür: ${t.category}</span>
+                <span class="tag-pill">👑 Yetkili: ${t.owner}</span><span class="tag-pill">⚔️ Tür: ${t.category}</span>
               </div>
               <div class="card-bottom-bar" onclick="event.stopPropagation()">
                 <span style="font-size: 0.85rem; color: #cbd5e1;">Tier Discord</span>
@@ -536,13 +538,102 @@
               </div>
             </div>
           </div>
-        `).join('');
+        `).join('') + `</div>`;
+
+      } else if (currentMainView === 'community') {
+        showcase.innerHTML = `
+          <div class="community-box">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+              <div style="font-size: 3rem;">🤝</div>
+              <h2 style="font-size: 2rem; font-weight: 900; color: #fff;">TÜRK MINECRAFT TOPLULUĞU</h2>
+              <p style="color: #fbbf24; font-size: 1.1rem; font-weight: 600; margin-top: 0.3rem;">Minecraft tutkunlarının buluşma noktası!</p>
+              <img src="https://media.discordapp.net/attachments/1544131883665723392/1552337221040742410/line.gif?ex=6ab53e32&is=6ab3ecb2&hm=5a2e4b750b4fc8252bf6ec12d926b32de187e7fefbdde227b73d6e97fa025d3d&=" class="line-divider">
+            </div>
+            <h3 style="font-size: 1.3rem; font-weight: 800; color: #f8fafc; margin-bottom: 1rem;">🔥 SUNUCUMUZDA NELER VAR?</h3>
+            <div class="community-feature-grid">
+              <div class="c-feature-card"><div class="c-feature-icon">🏆</div><div><strong style="color: #fff;">Tier & PvP</strong><span style="color: #94a3b8; font-size: 0.88rem; display:block;">Detaylı rehberler, kitler ve PvP içerikleri</span></div></div>
+              <div class="c-feature-card"><div class="c-feature-icon">🎨</div><div><strong style="color: #fff;">ResourcePack</strong><span style="color: #94a3b8; font-size: 0.88rem; display:block;">En iyi 1.8 ve 1.9 PvP pack paylaşımları</span></div></div>
+              <div class="c-feature-card"><div class="c-feature-icon">📚</div><div><strong style="color: #fff;">Rehber & Modlar</strong><span style="color: #94a3b8; font-size: 0.88rem; display:block;">Mod önerileri ve optimizasyonlar</span></div></div>
+              <div class="c-feature-card"><div class="c-feature-icon">📢</div><div><strong style="color: #fff;">Tanıtım & Reklam</strong><span style="color: #94a3b8; font-size: 0.88rem; display:block;">Kendi sunucunu veya içeriğini tanıtma</span></div></div>
+              <div class="c-feature-card"><div class="c-feature-icon">🎁</div><div><strong style="color: #fff;">Etkinlikler</strong><span style="color: #94a3b8; font-size: 0.88rem; display:block;">Ödüllü çekilişler ve turnuvalar</span></div></div>
+              <div class="c-feature-card"><div class="c-feature-icon">💬</div><div><strong style="color: #fff;">Sohbet</strong><span style="color: #94a3b8; font-size: 0.88rem; display:block;">Samimi ve aktif topluluk ortamı</span></div></div>
+            </div>
+            <div class="partner-card">
+              <h4 style="font-size: 1.15rem; font-weight: 800; color: #fbbf24; margin-bottom: 0.5rem;">🤝 PARTNERLİK ŞARTLARI</h4>
+              <p style="color: #cbd5e1; font-size: 0.92rem; margin-bottom: 0.35rem;">🔹 <strong>Aktif topluluk & Karşılıklı destek:</strong> Sunucular arası saygılı iş birliği.</p>
+              <p style="color: #cbd5e1; font-size: 0.92rem;">🔹 <strong>Saygılı iletişim:</strong> Sıfır spam, küfürsüz ve dürüst ortam.</p>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+              <h4 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.6rem; color: #fff;">🚀 Sen de aramıza katıl!</h4>
+              <a href="https://discord.gg/turkmc" target="_blank" class="btn btn-discord" style="padding: 0.85rem 2.2rem; font-size: 1.05rem;">discord.gg/turkmc ➔</a>
+            </div>
+          </div>
+        `;
+
+      } else if (currentMainView === 'store') {
+        showcase.innerHTML = `
+          <div>
+            <div style="text-align: center; max-width: 700px; margin: 0 auto 2.5rem;">
+              <h2 style="font-size: 1.8rem; font-weight: 900; color: #fff; margin-bottom: 0.5rem;">📢 Discord Sunucu Reklam Paketleri</h2>
+              <p style="color: #94a3b8; font-size: 0.95rem;">Sunucunuzu TÜRKMC'nin binlerce aktif Minecraft oyuncusuna tanıtın! Satın almak için pakete tıklayarak Discord'umuza katılabilirsiniz.</p>
+            </div>
+            <div class="store-grid">
+              <div class="store-card copper" onclick="window.open('https://discord.gg/turkmc', '_blank')">
+                <div class="store-badge" style="background: rgba(217,119,6,0.2); color: #d97706; border: 1px solid #d97706;">BAKIR PAKET</div>
+                <div style="font-size: 2.5rem; margin-top: 0.8rem;">🥉</div>
+                <h3 style="font-size: 1.3rem; font-weight: 800; color: #d97706; margin-top: 0.4rem;">Bakır Paket</h3>
+                <div class="store-price">200 <span style="font-size: 1rem; color: #94a3b8;">TL</span></div>
+                <p style="font-size: 0.82rem; color: #64748b;">Hızlı ve bütçe dostu tanıtım</p>
+                <ul class="store-features-list">
+                  <li>Discord Tanıtım Kanalında Paylaşım</li><li>Sunucu Afişi ve Davet Linki</li><li>Kalıcı Paylaşım</li><li>1x Duyuru Bildirimi</li>
+                </ul>
+                <button class="btn btn-gold" style="margin-top: auto; width: 100%; background: #d97706; color: #fff;">Discord'dan Sipariş Ver ➔</button>
+              </div>
+              <div class="store-card iron" onclick="window.open('https://discord.gg/turkmc', '_blank')">
+                <div class="store-badge" style="background: rgba(148,163,184,0.2); color: #cbd5e1; border: 1px solid #cbd5e1;">DEMİR PAKET</div>
+                <div style="font-size: 2.5rem; margin-top: 0.8rem;">🥈</div>
+                <h3 style="font-size: 1.3rem; font-weight: 800; color: #cbd5e1; margin-top: 0.4rem;">Demir Paket</h3>
+                <div class="store-price">250 <span style="font-size: 1rem; color: #94a3b8;">TL</span></div>
+                <p style="font-size: 0.82rem; color: #64748b;">Etkili sunucu görünürlüğü</p>
+                <ul class="store-features-list">
+                  <li>Öne Çıkan Reklam Kanalı</li><li>Görsel & Özel Metin Paylaşımı</li><li>@here Etiketli Bildirim</li><li>Sitede Ön Sıralara Geçiş</li>
+                </ul>
+                <button class="btn btn-ghost" style="margin-top: auto; width: 100%; color: #fff; border-color: #cbd5e1;">Discord'dan Sipariş Ver ➔</button>
+              </div>
+              <div class="store-card gold" onclick="window.open('https://discord.gg/turkmc', '_blank')">
+                <div class="store-badge" style="background: rgba(245,158,11,0.25); color: #fbbf24; border: 1px solid #f59e0b;">ÇOK SATAN 🔥</div>
+                <div style="font-size: 2.5rem; margin-top: 0.8rem;">🥇</div>
+                <h3 style="font-size: 1.3rem; font-weight: 800; color: #fbbf24; margin-top: 0.4rem;">Altın Paket</h3>
+                <div class="store-price" style="color: #fbbf24;">400 <span style="font-size: 1rem; color: #94a3b8;">TL</span></div>
+                <p style="font-size: 0.82rem; color: #fbbf24;">Maksimum Oyuncu Çekme</p>
+                <ul class="store-features-list">
+                  <li>@everyone Bildirimli Özel Duyuru</li><li>Web Sitemizde Yıldızlı (VIP) Görünüm</li><li>Discord Sabitlenmiş Mesaj (3 Gün)</li><li>Özel Reklam Odası Tahsisi</li>
+                </ul>
+                <button class="btn btn-gold" style="margin-top: auto; width: 100%;">Discord'dan Sipariş Ver ➔</button>
+              </div>
+              <div class="store-card diamond" onclick="window.open('https://discord.gg/turkmc', '_blank')">
+                <div class="store-badge" style="background: rgba(6,182,212,0.25); color: #22d3ee; border: 1px solid #06b6d4;">SPONSOR 💎</div>
+                <div style="font-size: 2.5rem; margin-top: 0.8rem;">💎</div>
+                <h3 style="font-size: 1.3rem; font-weight: 800; color: #22d3ee; margin-top: 0.4rem;">Elmas Paket</h3>
+                <div class="store-price" style="color: #22d3ee;">600 <span style="font-size: 1rem; color: #94a3b8;">TL</span></div>
+                <p style="font-size: 0.82rem; color: #22d3ee;">Tam Kapsamlı Sponsorluk</p>
+                <ul class="store-features-list">
+                  <li>2x @everyone + @here Bildirimi</li><li>Web Sitesi En Üst VIP Sıralama (1 Hafta)</li><li>Discord Sponsor Rolü ve Özel Kategori</li><li>Özel Çekiliş / Turnuva Sponsorluğu</li>
+                </ul>
+                <button class="btn btn-gold" style="margin-top: auto; width: 100%; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff;">Discord'dan Sipariş Ver ➔</button>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem; background: rgba(15,23,42,0.6); border: 1px dashed rgba(255,255,255,0.1); border-radius: 14px; padding: 1.25rem;">
+              <p style="color: #cbd5e1; font-size: 0.95rem;">💡 <em>Paket satın almak veya özel reklam teklifi almak için paketlere tıklayarak Discord'a gelin ve ticket açın!</em></p>
+            </div>
+          </div>
+        `;
       }
     }
 
     function getEmptyState(icon, title, desc, modalId, btnText) {
       return `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1.5rem; background: rgba(15, 23, 42, 0.6); border-radius: 16px; border: 1px dashed rgba(255, 255, 255, 0.12); backdrop-filter: blur(10px);">
+        <div style="text-align: center; padding: 4rem 1.5rem; background: rgba(15,23,42,0.6); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.12); backdrop-filter: blur(10px);">
           <div style="font-size: 2.8rem; margin-bottom: 0.5rem;">${icon}</div>
           <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.35rem; color: #fff;">${title}</h3>
           <p style="color: #94a3b8; font-size: 0.9rem; max-width: 480px; margin: 0 auto 1.25rem;">${desc}</p>
@@ -559,10 +650,8 @@
       document.getElementById('detailTitle').textContent = srv.name;
       document.getElementById('detailBadge').textContent = srv.category;
       document.getElementById('detailSlogan').textContent = srv.slogan || 'Minecraft Sunucu Tanıtımı';
-
       const ping = pingCache[srv.ip];
       const livePlayersText = ping && ping.online ? `${ping.players.online} / ${ping.players.max} Oyuncu (Canlı)` : (srv.slot || '500');
-
       document.getElementById('detailSpecsGrid').innerHTML = `
         <div class="spec-card"><div class="lbl">Sunucu IP</div><div class="val" style="color: #fbbf24; font-family: monospace;">${srv.ip}</div></div>
         <div class="spec-card"><div class="lbl">Canlı Oyuncu</div><div class="val">${livePlayersText}</div></div>
@@ -584,15 +673,12 @@
       document.getElementById('detailTitle').textContent = `${clan.name} ${clan.tag}`;
       document.getElementById('detailBadge').textContent = clan.gamemode || 'Klan';
       document.getElementById('detailSlogan').textContent = clan.slogan || 'Minecraft Klanı';
-
       document.getElementById('detailSpecsGrid').innerHTML = `
         <div class="spec-card"><div class="lbl">Klan Lideri</div><div class="val" style="color: #c084fc;">${clan.leader}</div></div>
         <div class="spec-card"><div class="lbl">Üye Sayısı</div><div class="val">${clan.members}</div></div>
         <div class="spec-card"><div class="lbl">Oyun Modu</div><div class="val">${clan.gamemode}</div></div>
       `;
-      document.getElementById('detailActionBtns').innerHTML = `
-        <a href="${clan.discord}" target="_blank" class="btn btn-purple" style="flex: 1;">⚔️ Klana Katıl / Discord ➔</a>
-      `;
+      document.getElementById('detailActionBtns').innerHTML = `<a href="${clan.discord}" target="_blank" class="btn btn-purple" style="flex: 1;">⚔️ Klana Katıl / Discord ➔</a>`;
       document.getElementById('detailDescription').textContent = clan.description;
       openModal('detailModal');
     }
@@ -605,15 +691,12 @@
       document.getElementById('detailTitle').textContent = tier.name;
       document.getElementById('detailBadge').textContent = tier.category;
       document.getElementById('detailSlogan').textContent = tier.slogan || 'PvP Tierlist';
-
       document.getElementById('detailSpecsGrid').innerHTML = `
         <div class="spec-card"><div class="lbl">Kategori</div><div class="val" style="color: #fb7185;">${tier.category}</div></div>
         <div class="spec-card"><div class="lbl">Yetkili / Testçi</div><div class="val">${tier.owner}</div></div>
         <div class="spec-card"><div class="lbl">Derecelendirme</div><div class="val">Resmi Sıralama</div></div>
       `;
-      document.getElementById('detailActionBtns').innerHTML = `
-        <a href="${tier.discord}" target="_blank" class="btn btn-rose" style="flex: 1;">🏆 Tier Testine Gir / Discord ➔</a>
-      `;
+      document.getElementById('detailActionBtns').innerHTML = `<a href="${tier.discord}" target="_blank" class="btn btn-rose" style="flex: 1;">🏆 Tier Testine Gir / Discord ➔</a>`;
       document.getElementById('detailDescription').textContent = tier.description;
       openModal('detailModal');
     }
@@ -621,8 +704,7 @@
     function handleSubmitServer(e) {
       e.preventDefault();
       const newServer = {
-        id: "srv-pending-" + Date.now(),
-        type: "server",
+        id: "srv-pending-" + Date.now(), type: "server",
         name: document.getElementById('srvName').value.trim(),
         ip: document.getElementById('srvIp').value.trim(),
         category: document.getElementById('srvCategory').value,
@@ -642,8 +724,7 @@
     function handleSubmitClan(e) {
       e.preventDefault();
       const newClan = {
-        id: "clan-pending-" + Date.now(),
-        type: "clan",
+        id: "clan-pending-" + Date.now(), type: "clan",
         name: document.getElementById('clanName').value.trim(),
         tag: document.getElementById('clanTag').value.trim(),
         leader: document.getElementById('clanLeader').value.trim(),
@@ -663,8 +744,7 @@
     function handleSubmitTier(e) {
       e.preventDefault();
       const newTier = {
-        id: "tier-pending-" + Date.now(),
-        type: "tierlist",
+        id: "tier-pending-" + Date.now(), type: "tierlist",
         name: document.getElementById('tierName').value.trim(),
         category: document.getElementById('tierCategory').value,
         owner: document.getElementById('tierOwner').value.trim(),
