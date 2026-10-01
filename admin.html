@@ -1,125 +1,766 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TURKMC Yönetim</title>
-<style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#eee;background:#111;min-height:100vh}
-body:before{content:"";position:fixed;inset:0;background:linear-gradient(135deg,#111 0%,#1b1405 55%,#090909 100%);z-index:-2}
-.wrap{width:min(1100px,94%);margin:0 auto;padding:40px 0}
-.card{background:rgba(20,20,20,.94);border:1px solid #8f6a20;border-radius:16px;padding:24px;box-shadow:0 10px 35px #0008;margin-bottom:20px}
-h1,h2{color:#f5c542}input,select,textarea{width:100%;padding:12px;margin:7px 0 14px;background:#111;color:#fff;border:1px solid #555;border-radius:8px}textarea{min-height:100px;resize:vertical}
-button{border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer;background:#d9a927;color:#111;margin:4px}
-button.danger{background:#b52a2a;color:#fff}button.gray{background:#444;color:#fff}
-.hidden{display:none}.msg{padding:12px;border-radius:8px;margin:10px 0}.err{background:#481c1c}.ok{background:#173c22}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:15px}.server{border:1px solid #444;border-radius:12px;padding:16px;background:#181818}
-.small{color:#aaa;font-size:13px}.tag{display:inline-block;border:1px solid #8f6a20;border-radius:20px;padding:4px 9px;color:#f5c542;font-size:12px}
-.top{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
-a{color:#f5c542}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TÜRKMC - Yönetim Paneli (Admin)</title>
+  
+  <!-- Google Yazı Tipleri -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-gold: #f59e0b;
+      --gold-glow: rgba(245, 158, 11, 0.4);
+      --bg-dark: #0a0d14;
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success-green: #10b981;
+      --danger-red: #ef4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background: 
+        linear-gradient(180deg, rgba(10, 13, 20, 0.85) 0%, rgba(10, 13, 20, 0.95) 100%),
+        url('background.png') center center / cover no-repeat,
+        url('https://images.unsplash.com/photo-1627856013091-fed6e4e30025?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    /* Giriş Ekranı (Login Screen) */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .login-card {
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    }
+
+    .login-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #fbbf24;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Dashboard Düzeni */
+    .dashboard-view {
+      display: none;
+    }
+
+    .admin-navbar {
+      background: rgba(10, 13, 20, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .admin-nav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .admin-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 5rem;
+    }
+
+    /* İstatistik Kartları */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card .num {
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-card .label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Sekmeler */
+    .admin-tabs {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .tab-badge {
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.15rem 0.5rem;
+      border-radius: 100px;
+    }
+
+    /* Başvuru Kartları */
+    .application-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s;
+    }
+
+    .app-banner-row {
+      width: 100%;
+      height: 120px;
+      position: relative;
+      background: #1e293b;
+    }
+
+    .app-banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .app-content-body {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .app-specs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 1rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      .app-specs {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .app-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 1rem;
+    }
+
+    /* Buton Stilleri */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: #fff;
+    }
+    .btn-success:hover {
+      background: #059669;
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #0f172a;
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      margin-bottom: 1rem;
+    }
+    .form-input:focus {
+      border-color: var(--primary-gold);
+    }
+
+    /* Toast */
+    .toast-box {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #10b981;
+      color: #fff;
+      padding: 0.8rem 1.4rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      z-index: 999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+    .toast-box.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <div id="login" class="card">
-    <h1>🔐 TURKMC Yönetim</h1>
-    <p class="small">Yönetim paneline girmek için yönetici şifresini gir.</p>
-    <input id="password" type="password" placeholder="Yönetici şifresi">
-    <button onclick="login()">Giriş Yap</button>
-    <div id="loginMsg"></div>
-  </div>
 
-  <div id="panel" class="hidden">
-    <div class="card top">
-      <div><h1 style="margin:0">TURKMC Yönetim Paneli</h1><span class="small">Sunucu başvurularını buradan yönet.</span></div>
-      <button class="gray" onclick="logout()">Çıkış</button>
-    </div>
-    <div id="msg"></div>
-    <div class="card">
-      <h2>Sunucular</h2>
-      <div id="servers" class="grid"></div>
-    </div>
-  </div>
-</div>
+  <div class="bg-layer"></div>
 
-<script>
-const ADMIN_PASSWORD = "kerimingotu";
-
-const types=["Survival","SkyBlock","Factions","Towny","TrapPvP","PvP","BedWars","Pixelmon","Diğer"];
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const msg=(t,ok=false)=>document.getElementById("msg").innerHTML='<div class="msg '+(ok?'ok':'err')+'">'+esc(t)+'</div>';
-
-async function login(){
-  const password=document.getElementById("password").value;
-
-  if(password !== ADMIN_PASSWORD){
-    document.getElementById("loginMsg").innerHTML='<div class="msg err">Şifre yanlış.</div>';
-    return;
-  }
-
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("panel").classList.remove("hidden");
-  load();
-}
-
-async function load(){
-  const r=await fetch("/api/admin/servers");
-  if(r.status===401){
-    document.getElementById("panel").classList.add("hidden");
-    document.getElementById("login").classList.remove("hidden");
-    return
-  }
-
-  const list=await r.json();
-  const box=document.getElementById("servers");
-
-  if(!list.length){
-    box.innerHTML="<p>Henüz sunucu başvurusu yok.</p>";
-    return
-  }
-
-  box.innerHTML=list.map(s=>`
-    <div class="server">
-      <div class="tag">${esc(s.status==="approved"?"YAYINDA":"ONAY BEKLİYOR")}</div>
-      <h3>${esc(s.name)}</h3>
-      <div><b>IP:</b> ${esc(s.ip)}</div>
-      <div><b>Tür:</b> ${esc(s.type)}</div>
-      <p>${esc(s.description||"Açıklama yok.")}</p>
-      ${s.website?`<div><a href="${esc(s.website)}" target="_blank" rel="noopener">Bağlantıyı aç</a></div>`:""}
-      <div style="margin-top:10px">
-        ${s.status!=="approved"?`<button onclick="approve(${s.id})">✓ Onayla</button>`:""}
-        <button onclick='edit(${JSON.stringify(s).replace(/</g,"\\u003c")})'>Düzenle</button>
-        <button class="danger" onclick="removeServer(${s.id})">Sil</button>
+  <!-- =========================================================================
+       1. GİRİŞ EKRANI (ŞİFRE KORUMASI)
+       ========================================================================= -->
+  <div class="login-container" id="loginScreen">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" fill="#F59E0B" stroke="#FDE047" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M5 19H19V17H5V19Z" fill="#D97706"/>
+        </svg>
+        TÜRKMC
       </div>
-    </div>`).join("");
-}
+      <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.4rem;">Yönetici Girişi</h2>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem;">
+        Sunucu başvurularını onaylamak ve yönetmek için şifrenizi girin.
+      </p>
 
-async function approve(id){
-  const r=await fetch("/api/admin/servers/"+id+"/approve",{method:"POST"});
-  msg(r.ok?"Sunucu yayınlandı.":"Onaylama başarısız.",r.ok);load();
-}
+      <form onsubmit="handleLogin(event)">
+        <input type="password" id="adminPasswordInput" class="form-input" placeholder="Yönetici Şifresi (Varsayılan: turkmc2026)" required autofocus>
+        <div id="loginErrorMsg" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 1rem; display: none;">
+          ⚠️ Hatalı şifre girdiniz! Lütfen tekrar deneyin.
+        </div>
+        <button type="submit" class="btn btn-gold" style="width: 100%; padding: 0.85rem; justify-content: center; font-size: 1rem;">
+          Panele Giriş Yap ➔
+        </button>
+      </form>
 
-async function removeServer(id){
-  if(!confirm("Bu sunucu silinsin mi?"))return;
-  const r=await fetch("/api/admin/servers/"+id,{method:"DELETE"});
-  msg(r.ok?"Sunucu silindi.":"Silme başarısız.",r.ok);load();
-}
+      <div style="margin-top: 1.5rem; font-size: 0.82rem; color: #64748b;">
+        <a href="index.html" style="color: #94a3b8; text-decoration: none;">← Ana Sayfaya Dön</a>
+      </div>
+    </div>
+  </div>
 
-async function edit(s){
-  const name=prompt("Sunucu adı:",s.name); if(name===null)return;
-  const ip=prompt("IP:",s.ip); if(ip===null)return;
-  const type=prompt("Tür (Survival, SkyBlock, Factions, Towny, TrapPvP, PvP, BedWars, Pixelmon, Diğer):",s.type); if(type===null)return;
-  const website=prompt("Discord/Web sitesi:",s.website||""); if(website===null)return;
-  const description=prompt("Açıklama:",s.description||""); if(description===null)return;
-  const status=confirm("Yayınlansın mı? Tamam = yayınla, İptal = onay beklesin.")?"approved":"pending";
-  const r=await fetch("/api/admin/servers/"+s.id,{method:"PUT",headers:{"content-type":"application/json"},body:JSON.stringify({name,ip,type,website,description,status})});
-  msg(r.ok?"Sunucu güncellendi.":(await r.json()).error||"Güncelleme başarısız.",r.ok);load();
-}
+  <!-- =========================================================================
+       2. YÖNETİM DASHBOARD (GİRİŞ YAPILDIKTAN SONRA AÇILIR)
+       ========================================================================= -->
+  <div class="dashboard-view" id="dashboardScreen">
+    <header class="admin-navbar">
+      <div class="admin-nav-inner">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 0.5rem; font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 900; color: #fbbf24;">
+            👑 TÜRKMC
+          </a>
+          <span style="font-size: 0.85rem; background: rgba(245, 158, 11, 0.2); color: #fbbf24; padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 700;">
+            YÖNETİM PANELİ
+          </span>
+        </div>
 
-async function logout(){
-  await fetch("/api/admin/logout",{method:"POST"});
-  location.reload();
-}
-</script>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <a href="index.html" class="btn btn-ghost">
+            🌐 Siteyi Görüntüle
+          </a>
+          <button class="btn btn-danger" onclick="logoutAdmin()">
+            Çıkış Yap
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-container">
+      <!-- İstatistik Sayaçları -->
+      <div class="stats-grid">
+        <div class="stat-card" style="border-left: 4px solid #ef4444;">
+          <div class="num" id="statPendingCount">0</div>
+          <div class="label">⏳ Onay Bekleyen Sunucu Başvurusu</div>
+        </div>
+        <div class="stat-card" style="border-left: 4px solid #10b981;">
+          <div class="num" id="statLiveCount">0</div>
+          <div class="label">✅ Yayında Olan Aktif Sunucu</div>
+        </div>
+        <div class="stat-card" style="border-left: 4px solid #f59e0b;">
+          <div class="num" id="statTotalCount">0</div>
+          <div class="label">📊 Toplam Kayıtlı Sunucu</div>
+        </div>
+      </div>
+
+      <!-- Sekme Menüsü -->
+      <div class="admin-tabs">
+        <button class="tab-btn active" onclick="switchTab('pending')" id="tabBtnPending">
+          ⏳ Bekleyen Başvurular <span class="tab-badge" id="tabBadgePending">0</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('live')" id="tabBtnLive">
+          ✅ Yayındaki Sunucular
+        </button>
+        <button class="tab-btn" onclick="switchTab('settings')" id="tabBtnSettings">
+          ⚙️ Şifre & Veri Yedekleme
+        </button>
+      </div>
+
+      <!-- =====================================================================
+           SEKME 1: BEKLEYEN BAŞVURULAR (ONAY / RET)
+           ===================================================================== -->
+      <div id="sectionPending">
+        <div style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+          <h3 style="font-size: 1.25rem; font-weight: 800;">Gelen Sunucu Başvuruları</h3>
+          <span style="color: var(--text-muted); font-size: 0.88rem;">
+            Başvuruları inceleyip kabul ettiğinizde anında ana sayfada yayına girer.
+          </span>
+        </div>
+
+        <div id="pendingListContainer">
+          <!-- Başvurular JS ile yüklenecek -->
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           SEKME 2: YAYINDAKİ SUNUCULAR
+           ===================================================================== -->
+      <div id="sectionLive" style="display: none;">
+        <div style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+          <h3 style="font-size: 1.25rem; font-weight: 800;">Şu Anda Sitede Yayında Olan Sunucular</h3>
+        </div>
+
+        <div id="liveListContainer">
+          <!-- Yayındaki sunucular JS ile yüklenecek -->
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           SEKME 3: AYARLAR & YEDEKLEME
+           ===================================================================== -->
+      <div id="sectionSettings" style="display: none;">
+        <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 2rem; max-width: 650px;">
+          <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem;">🔐 Yönetici Şifresini Değiştir</h3>
+          <form onsubmit="handleChangePassword(event)">
+            <label style="font-size: 0.85rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 0.4rem;">Yeni Yönetici Şifresi</label>
+            <input type="password" id="newAdminPassword" class="form-input" placeholder="Yeni şifrenizi yazın" required>
+            <button type="submit" class="btn btn-gold">Şifreyi Güncelle</button>
+          </form>
+
+          <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.08); margin: 2rem 0;">
+
+          <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">💾 Veri Yönetimi & Yedekleme</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
+            Sunucu listesini JSON formatında indirebilir veya varsayılan sunucu listesini geri yükleyebilirsiniz.
+          </p>
+
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="btn btn-ghost" onclick="exportDataJson()">
+              📥 Verileri İndir (JSON Yedek)
+            </button>
+            <button class="btn btn-danger" onclick="resetToDefaults()">
+              🔄 Varsayılan Sunucuları Yükle
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-box" id="toastNotice">
+    <span>✓</span> <span id="toastMsg">İşlem başarıyla tamamlandı!</span>
+  </div>
+
+  <script>
+    // Şifre Yönetimi (Varsayılan: turkmc2026)
+    function getAdminPassword() {
+      return localStorage.getItem('turkmc_admin_password') || 'turkmc2026';
+    }
+
+    // Giriş Kontrolü
+    function handleLogin(e) {
+      e.preventDefault();
+      const enteredPass = document.getElementById('adminPasswordInput').value;
+      const actualPass = getAdminPassword();
+
+      if (enteredPass === actualPass) {
+        sessionStorage.setItem('turkmc_admin_logged_in', 'true');
+        showDashboard();
+      } else {
+        document.getElementById('loginErrorMsg').style.display = 'block';
+      }
+    }
+
+    function showDashboard() {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboardScreen').style.display = 'block';
+      loadDashboardData();
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('turkmc_admin_logged_in');
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('dashboardScreen').style.display = 'none';
+      document.getElementById('adminPasswordInput').value = '';
+      document.getElementById('loginErrorMsg').style.display = 'none';
+    }
+
+    // Sekme Değiştirme
+    function switchTab(tab) {
+      document.getElementById('sectionPending').style.display = tab === 'pending' ? 'block' : 'none';
+      document.getElementById('sectionLive').style.display = tab === 'live' ? 'block' : 'none';
+      document.getElementById('sectionSettings').style.display = tab === 'settings' ? 'block' : 'none';
+
+      document.getElementById('tabBtnPending').classList.toggle('active', tab === 'pending');
+      document.getElementById('tabBtnLive').classList.toggle('active', tab === 'live');
+      document.getElementById('tabBtnSettings').classList.toggle('active', tab === 'settings');
+    }
+
+    // Verileri Yükle & Listele
+    function getPendingServers() {
+      const data = localStorage.getItem('turkmc_pending_servers');
+      return data ? JSON.parse(data) : [];
+    }
+
+    function getLiveServers() {
+      const data = localStorage.getItem('turkmc_approved_servers');
+      return data ? JSON.parse(data) : [];
+    }
+
+    function loadDashboardData() {
+      const pending = getPendingServers();
+      const live = getLiveServers();
+
+      document.getElementById('statPendingCount').textContent = pending.length;
+      document.getElementById('statLiveCount').textContent = live.length;
+      document.getElementById('statTotalCount').textContent = pending.length + live.length;
+      document.getElementById('tabBadgePending').textContent = pending.length;
+
+      renderPendingList(pending);
+      renderLiveList(live);
+    }
+
+    // Bekleyen Başvuruları Ekrana Yazdır
+    function renderPendingList(list) {
+      const container = document.getElementById('pendingListContainer');
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 3rem; background: rgba(15, 23, 42, 0.6); border-radius: 16px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🎉</div>
+            <h4 style="font-size: 1.1rem; font-weight: 700;">Onay bekleyen başvuru bulunmuyor.</h4>
+            <p style="color: #64748b; font-size: 0.85rem;">Yeni bir sunucu eklendiğinde burada görüntülenecektir.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(item => `
+        <div class="application-card" id="app-${item.id}">
+          <div class="app-banner-row">
+            <img src="${item.banner}" class="app-banner-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'">
+          </div>
+          <div class="app-content-body">
+            <div class="app-header">
+              <div>
+                <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff;">${item.name}</h3>
+                <p style="color: #fbbf24; font-size: 0.88rem; font-weight: 600;">${item.slogan || ''}</p>
+              </div>
+              <span style="background: rgba(6, 182, 212, 0.2); color: #38bdf8; padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">
+                ${item.category}
+              </span>
+            </div>
+
+            <div class="app-specs">
+              <div><strong>IP:</strong> ${item.ip}</div>
+              <div><strong>Sürüm:</strong> ${item.version}</div>
+              <div><strong>Kapasite:</strong> ${item.slot || 'Belirtilmedi'}</div>
+              <div><strong>Zorluk:</strong> ${item.difficulty || 'Standart'}</div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 8px; font-size: 0.88rem; color: #cbd5e1; white-space: pre-line;">
+              <strong>Tanıtım Metni:</strong><br>${item.description}
+            </div>
+
+            <div class="app-actions">
+              <span style="margin-right: auto; font-size: 0.8rem; color: #64748b;">Başvuru Tarihi: ${item.appliedAt || 'Bugün'}</span>
+              <button class="btn btn-danger" onclick="rejectApplication('${item.id}')">
+                ✕ Reddet / Sil
+              </button>
+              <button class="btn btn-success" onclick="approveApplication('${item.id}')">
+                ✓ Kabul Et (Yayına Al)
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Yayındaki Sunucuları Ekrana Yazdır
+    function renderLiveList(list) {
+      const container = document.getElementById('liveListContainer');
+      if (list.length === 0) {
+        container.innerHTML = `<div style="text-align: center; padding: 2rem;">Yayında sunucu yok.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(item => `
+        <div class="application-card" style="margin-bottom: 1rem;">
+          <div class="app-content-body" style="padding: 1.2rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <img src="${item.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + item.name}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                <div>
+                  <h4 style="font-size: 1.1rem; font-weight: 800;">${item.name}</h4>
+                  <span style="font-size: 0.82rem; color: #fbbf24; font-family: monospace;">${item.ip}</span>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <button class="btn ${item.featured ? 'btn-gold' : 'btn-ghost'}" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;" onclick="toggleFeatured('${item.id}')">
+                  ${item.featured ? '★ Öne Çıkarıldı' : '☆ Öne Çıkar'}
+                </button>
+                <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;" onclick="deleteLiveServer('${item.id}')">
+                  Kaldır / Sil
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // BAŞVURUYU ONAYLA (KABUL ET)
+    function approveApplication(id) {
+      const pending = getPendingServers();
+      const target = pending.find(p => p.id === id);
+      if (!target) return;
+
+      // Bekleyenlerden çıkar
+      const remainingPending = pending.filter(p => p.id !== id);
+      localStorage.setItem('turkmc_pending_servers', JSON.stringify(remainingPending));
+
+      // Yayındakilere ekle
+      const live = getLiveServers();
+      target.id = "srv-" + Date.now();
+      target.status = 'approved';
+      live.unshift(target); // En başa ekle
+      localStorage.setItem('turkmc_approved_servers', JSON.stringify(live));
+
+      showToast(`✅ "${target.name}" sunucusu kabul edildi ve yayına alındı!`);
+      loadDashboardData();
+    }
+
+    // BAŞVURUYU REDDET
+    function rejectApplication(id) {
+      if (!confirm("Bu başvuruyu reddetmek ve silmek istediğinize emin misiniz?")) return;
+      const pending = getPendingServers();
+      const remaining = pending.filter(p => p.id !== id);
+      localStorage.setItem('turkmc_pending_servers', JSON.stringify(remaining));
+
+      showToast("❌ Başvuru reddedildi ve silindi.");
+      loadDashboardData();
+    }
+
+    // Yayındaki Sunucuyu Sil
+    function deleteLiveServer(id) {
+      if (!confirm("Bu sunucuyu yayından kaldırmak istediğinize emin misiniz?")) return;
+      const live = getLiveServers().filter(s => s.id !== id);
+      localStorage.setItem('turkmc_approved_servers', JSON.stringify(live));
+
+      showToast("Sunucu yayından kaldırıldı.");
+      loadDashboardData();
+    }
+
+    // Öne Çıkar / Normal Yap
+    function toggleFeatured(id) {
+      const live = getLiveServers();
+      const item = live.find(s => s.id === id);
+      if (item) {
+        item.featured = !item.featured;
+        localStorage.setItem('turkmc_approved_servers', JSON.stringify(live));
+        loadDashboardData();
+        showToast(item.featured ? "Sunucu öne çıkarıldı!" : "Öne çıkarma kaldırıldı.");
+      }
+    }
+
+    // Şifre Değiştir
+    function handleChangePassword(e) {
+      e.preventDefault();
+      const newPass = document.getElementById('newAdminPassword').value.trim();
+      if (newPass.length < 4) {
+        alert("Şifre en az 4 karakter olmalıdır!");
+        return;
+      }
+      localStorage.setItem('turkmc_admin_password', newPass);
+      document.getElementById('newAdminPassword').value = '';
+      showToast("🔑 Yönetici şifreniz başarıyla güncellendi!");
+    }
+
+    // Verileri JSON Olarak İndir
+    function exportDataJson() {
+      const data = {
+        approved: getLiveServers(),
+        pending: getPendingServers(),
+        exportedAt: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `turkmc_sunucu_yedek_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Varsayılanlara Dön
+    function resetToDefaults() {
+      if (!confirm("Tüm değişiklikler sıfırlanıp varsayılan sunucular yüklensin mi?")) return;
+      localStorage.removeItem('turkmc_approved_servers');
+      localStorage.removeItem('turkmc_pending_servers');
+      loadDashboardData();
+      showToast("Varsayılan sunucular başarıyla geri yüklendi.");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotice');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Sayfa Açılışı
+    window.addEventListener('DOMContentLoaded', () => {
+      if (sessionStorage.getItem('turkmc_admin_logged_in') === 'true') {
+        showDashboard();
+      }
+    });
+  </script>
 </body>
 </html>
