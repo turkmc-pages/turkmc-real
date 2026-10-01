@@ -4,341 +4,67 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TÜRKMC - Yönetim Paneli (Admin)</title>
-  
-  <!-- Google Yazı Tipleri -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  
   <style>
     :root {
-      --primary-gold: #f59e0b;
-      --gold-glow: rgba(245, 158, 11, 0.4);
-      --bg-dark: #0a0d14;
-      --card-bg: rgba(15, 23, 42, 0.88);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --success-green: #10b981;
-      --danger-red: #ef4444;
+      --primary-gold: #f59e0b; --gold-glow: rgba(245, 158, 11, 0.4); --bg-dark: #0a0d14;
+      --card-bg: rgba(15, 23, 42, 0.88); --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc; --text-muted: #94a3b8; --success-green: #10b981; --danger-red: #ef4444;
+      --clan-purple: #a855f7; --tier-rose: #f43f5e;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      min-height: 100vh;
-      position: relative;
-    }
-
-    .bg-layer {
-      position: fixed;
-      inset: 0;
-      background: 
-        linear-gradient(180deg, rgba(10, 13, 20, 0.85) 0%, rgba(10, 13, 20, 0.95) 100%),
-        url('background.png') center center / cover no-repeat,
-        url('https://images.unsplash.com/photo-1627856013091-fed6e4e30025?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat;
-      z-index: -2;
-      pointer-events: none;
-    }
-
-    /* Giriş Ekranı */
-    .login-container {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-    }
-
-    .login-card {
-      background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 20px;
-      padding: 2.5rem 2rem;
-      width: 100%;
-      max-width: 440px;
-      text-align: center;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
-    }
-
-    .login-logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-family: 'Cinzel', serif;
-      font-size: 1.8rem;
-      font-weight: 900;
-      color: #fbbf24;
-      margin-bottom: 0.5rem;
-    }
-
-    /* Dashboard */
-    .dashboard-view {
-      display: none;
-    }
-
-    .admin-navbar {
-      background: rgba(10, 13, 20, 0.9);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    .admin-nav-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .admin-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2.5rem 1.5rem 5rem;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.25rem;
-      margin-bottom: 2.5rem;
-    }
-
-    @media (max-width: 768px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .stat-card {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 1.5rem;
-      position: relative;
-    }
-
-    .stat-card .num {
-      font-size: 2.4rem;
-      font-weight: 900;
-      color: #fff;
-      line-height: 1.1;
-      margin-bottom: 0.25rem;
-    }
-
-    .stat-card .label {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .admin-tabs {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      margin-bottom: 2rem;
-      padding-bottom: 0.5rem;
-    }
-
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      font-weight: 700;
-      padding: 0.75rem 1.25rem;
-      border-radius: 10px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all 0.2s;
-    }
-
-    .tab-btn:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .tab-btn.active {
-      color: #fbbf24;
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-
-    .tab-badge {
-      background: #ef4444;
-      color: #fff;
-      font-size: 0.75rem;
-      font-weight: 800;
-      padding: 0.15rem 0.5rem;
-      border-radius: 100px;
-    }
-
-    .application-card {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      transition: all 0.2s;
-    }
-
-    .app-banner-row {
-      width: 100%;
-      height: 120px;
-      position: relative;
-      background: #1e293b;
-    }
-
-    .app-banner-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .app-content-body {
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .app-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
-    .app-specs {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.75rem;
-      background: rgba(0, 0, 0, 0.25);
-      padding: 1rem;
-      border-radius: 12px;
-      font-size: 0.85rem;
-    }
-
-    @media (max-width: 768px) {
-      .app-specs {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    .app-actions {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 0.75rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      padding-top: 1rem;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1.25rem;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 0.88rem;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-      text-decoration: none;
-    }
-
-    .btn-success {
-      background: #10b981;
-      color: #fff;
-    }
-    .btn-success:hover {
-      background: #059669;
-      transform: translateY(-2px);
-    }
-
-    .btn-danger {
-      background: #ef4444;
-      color: #fff;
-    }
-    .btn-danger:hover {
-      background: #dc2626;
-      transform: translateY(-2px);
-    }
-
-    .btn-gold {
-      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-      color: #0f172a;
-    }
-
-    .btn-ghost {
-      background: rgba(255, 255, 255, 0.08);
-      color: #cbd5e1;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .btn-ghost:hover {
-      background: rgba(255, 255, 255, 0.14);
-      color: #fff;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
-      color: #fff;
-      font-size: 0.95rem;
-      outline: none;
-      margin-bottom: 1rem;
-    }
-    .form-input:focus {
-      border-color: var(--primary-gold);
-    }
-
-    .toast-box {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: #10b981;
-      color: #fff;
-      padding: 0.8rem 1.4rem;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      z-index: 999;
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.3s;
-    }
-    .toast-box.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; position: relative; }
+    .bg-layer { position: fixed; inset: 0; background: linear-gradient(180deg, rgba(10, 13, 20, 0.85) 0%, rgba(10, 13, 20, 0.95) 100%), url('background.png') center center / cover no-repeat; z-index: -2; pointer-events: none; }
+    .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+    .login-card { background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 20px; padding: 2.5rem 2rem; width: 100%; max-width: 440px; text-align: center; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7); }
+    .login-logo { display: inline-flex; align-items: center; gap: 0.6rem; font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 900; color: #fbbf24; margin-bottom: 0.5rem; }
+    .dashboard-view { display: none; }
+    .admin-navbar { background: rgba(10, 13, 20, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); position: sticky; top: 0; z-index: 50; }
+    .admin-nav-inner { max-width: 1400px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .admin-container { max-width: 1400px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 2.5rem; }
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr; } }
+    .stat-card { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 1.35rem; position: relative; }
+    .stat-card .num { font-size: 2.2rem; font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 0.25rem; }
+    .stat-card .label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+    .admin-tabs { display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 1.5rem; padding-bottom: 0.5rem; overflow-x: auto; }
+    .tab-btn { background: transparent; border: none; color: var(--text-muted); font-size: 0.95rem; font-weight: 700; padding: 0.75rem 1.25rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; white-space: nowrap; }
+    .tab-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+    .tab-btn.active { color: #fbbf24; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .tab-badge { background: #ef4444; color: #fff; font-size: 0.75rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 100px; }
+    .subtabs-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .subtab-btn { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s; }
+    .subtab-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+    .subtab-btn.active { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #fbbf24; }
+    .application-card { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 16px; overflow: hidden; margin-bottom: 1.5rem; display: flex; flex-direction: column; }
+    .app-banner-row { height: 120px; background: #020617; overflow: hidden; }
+    .app-banner-img { width: 100%; height: 100%; object-fit: cover; }
+    .app-content-body { padding: 1.5rem; }
+    .app-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+    .app-specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; background: rgba(0, 0, 0, 0.25); padding: 1rem; border-radius: 10px; margin-bottom: 1rem; font-size: 0.85rem; }
+    .app-specs strong { color: #94a3b8; }
+    .app-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .btn { padding: 0.55rem 1.15rem; border-radius: 10px; font-size: 0.88rem; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; transition: all 0.2s; }
+    .btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; }
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+    .btn-danger { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; }
+    .btn-danger:hover { background: #ef4444; color: #fff; }
+    .btn-ghost { background: rgba(255, 255, 255, 0.06); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+    .form-input { width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 0.75rem 1rem; color: #fff; font-size: 0.95rem; margin-bottom: 1rem; outline: none; }
+    .form-input:focus { border-color: #f59e0b; }
+    .toast-box { position: fixed; bottom: 2rem; right: 2rem; background: rgba(15, 23, 42, 0.95); border: 1px solid #10b981; padding: 1rem 1.5rem; border-radius: 12px; color: #fff; font-weight: 600; display: flex; align-items: center; gap: 0.6rem; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 100; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+    .toast-box.show { transform: translateY(0); opacity: 1; }
   </style>
 </head>
 <body>
 
   <div class="bg-layer"></div>
 
-  <!-- GİRİŞ EKRANI (TAMAMEN GİZLİ VE TEMİZ) -->
+  <!-- GİRİŞ EKRANI -->
   <div class="login-container" id="loginScreen">
     <div class="login-card">
       <div class="login-logo">
@@ -350,7 +76,7 @@
       </div>
       <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.4rem;">Yönetici Girişi</h2>
       <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem;">
-        Sunucu başvurularını onaylamak ve yönetmek için şifrenizi girin.
+        Sunucu, Klan ve Tierlist başvurularını yönetmek için şifrenizi girin.
       </p>
 
       <form onsubmit="handleLogin(event)">
@@ -383,12 +109,8 @@
         </div>
 
         <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <a href="index.html" class="btn btn-ghost">
-            🌐 Siteyi Görüntüle
-          </a>
-          <button class="btn btn-danger" onclick="logoutAdmin()">
-            Çıkış Yap
-          </button>
+          <a href="index.html" class="btn btn-ghost">🌐 Siteyi Görüntüle</a>
+          <button class="btn btn-danger" onclick="logoutAdmin()">Çıkış Yap</button>
         </div>
       </div>
     </header>
@@ -396,49 +118,65 @@
     <main class="admin-container">
       <div class="stats-grid">
         <div class="stat-card" style="border-left: 4px solid #ef4444;">
-          <div class="num" id="statPendingCount">0</div>
-          <div class="label">⏳ Onay Bekleyen Sunucu Başvurusu</div>
-        </div>
-        <div class="stat-card" style="border-left: 4px solid #10b981;">
-          <div class="num" id="statLiveCount">0</div>
-          <div class="label">✅ Yayında Olan Aktif Sunucu</div>
+          <div class="num" id="statPendingTotalCount">0</div>
+          <div class="label">⏳ Toplam Bekleyen Başvuru</div>
         </div>
         <div class="stat-card" style="border-left: 4px solid #f59e0b;">
-          <div class="num" id="statTotalCount">0</div>
-          <div class="label">📊 Toplam Kayıtlı Sunucu</div>
+          <div class="num" id="statServerCount">0</div>
+          <div class="label">🎮 Minecraft Sunucuları (Aktif)</div>
+        </div>
+        <div class="stat-card" style="border-left: 4px solid #a855f7;">
+          <div class="num" id="statClanCount">0</div>
+          <div class="label">⚔️ Klan Toplulukları (Aktif)</div>
+        </div>
+        <div class="stat-card" style="border-left: 4px solid #f43f5e;">
+          <div class="num" id="statTierCount">0</div>
+          <div class="label">🏆 Tierlist Sunucuları (Aktif)</div>
         </div>
       </div>
 
+      <!-- ANA SEKMELER -->
       <div class="admin-tabs">
-        <button class="tab-btn active" onclick="switchTab('pending')" id="tabBtnPending">
+        <button class="tab-btn active" onclick="switchMainTab('pending')" id="tabBtnPending">
           ⏳ Bekleyen Başvurular <span class="tab-badge" id="tabBadgePending">0</span>
         </button>
-        <button class="tab-btn" onclick="switchTab('live')" id="tabBtnLive">
-          ✅ Yayındaki Sunucular
+        <button class="tab-btn" onclick="switchMainTab('live')" id="tabBtnLive">
+          ✅ Yayındakiler (Onaylılar)
         </button>
-        <button class="tab-btn" onclick="switchTab('settings')" id="tabBtnSettings">
+        <button class="tab-btn" onclick="switchMainTab('settings')" id="tabBtnSettings">
           ⚙️ Şifre & Veri Yedekleme
         </button>
       </div>
 
-      <!-- SEKME 1: BEKLEYENLER -->
+      <!-- SEKME 1: BEKLEYEN BAŞVURULAR -->
       <div id="sectionPending">
-        <div style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
-          <h3 style="font-size: 1.25rem; font-weight: 800;">Gelen Sunucu Başvuruları</h3>
-          <span style="color: var(--text-muted); font-size: 0.88rem;">
-            Başvuruları inceleyip kabul ettiğinizde anında ana sayfada yayına girer.
-          </span>
+        <div class="subtabs-bar">
+          <button class="subtab-btn active" onclick="switchPendingSubTab('servers')" id="subtabPendingServers">
+            🎮 Minecraft Sunucuları (<span id="countPendingServers">0</span>)
+          </button>
+          <button class="subtab-btn" onclick="switchPendingSubTab('clans')" id="subtabPendingClans">
+            ⚔️ Klan Başvuruları (<span id="countPendingClans">0</span>)
+          </button>
+          <button class="subtab-btn" onclick="switchPendingSubTab('tierlist')" id="subtabPendingTier">
+            🏆 Tierlist Başvuruları (<span id="countPendingTier">0</span>)
+          </button>
         </div>
-
         <div id="pendingListContainer"></div>
       </div>
 
       <!-- SEKME 2: YAYINDAKİLER -->
       <div id="sectionLive" style="display: none;">
-        <div style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
-          <h3 style="font-size: 1.25rem; font-weight: 800;">Şu Anda Sitede Yayında Olan Sunucular</h3>
+        <div class="subtabs-bar">
+          <button class="subtab-btn active" onclick="switchLiveSubTab('servers')" id="subtabLiveServers">
+            🎮 Yayındaki Minecraft Sunucuları (<span id="countLiveServers">0</span>)
+          </button>
+          <button class="subtab-btn" onclick="switchLiveSubTab('clans')" id="subtabLiveClans">
+            ⚔️ Yayındaki Klanlar (<span id="countLiveClans">0</span>)
+          </button>
+          <button class="subtab-btn" onclick="switchLiveSubTab('tierlist')" id="subtabLiveTier">
+            🏆 Yayındaki Tierlist Sunucuları (<span id="countLiveTier">0</span>)
+          </button>
         </div>
-
         <div id="liveListContainer"></div>
       </div>
 
@@ -456,37 +194,37 @@
 
           <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">💾 Veri Yönetimi & Yedekleme</h3>
           <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
-            Sunucu listesini JSON formatında indirebilir veya sıfırlayabilirsiniz.
+            Tüm 3 kategorideki verileri (Sunucular, Klanlar, Tierlistler) tek tıkla JSON formatında indirebilirsiniz.
           </p>
 
           <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-            <button class="btn btn-ghost" onclick="exportDataJson()">
-              📥 Verileri İndir (JSON Yedek)
-            </button>
-            <button class="btn btn-danger" onclick="clearAllServers()">
-              🗑️ Tüm Sunucuları Temizle (Sıfırla)
-            </button>
+            <button class="btn btn-ghost" onclick="exportDataJson()">📥 Verileri İndir (JSON Yedek)</button>
+            <button class="btn btn-danger" onclick="clearAllData()">🗑️ Tüm Listeleri Sıfırla</button>
           </div>
         </div>
       </div>
     </main>
   </div>
 
-  <div class="toast-box" id="toastNotice">
-    <span>✓</span> <span id="toastMsg">İşlem başarıyla tamamlandı!</span>
-  </div>
+  <div class="toast-box" id="toastNotice"><span>✓</span> <span id="toastMsg">İşlem tamamlandı!</span></div>
 
   <script>
-    function getAdminPassword() {
-      return localStorage.getItem('turkmc_admin_password') || 'turkmc2026';
+    let currentMainTab = 'pending';
+    let currentPendingSubTab = 'servers';
+    let currentLiveSubTab = 'servers';
+
+    function getData(key) {
+      const saved = localStorage.getItem(key);
+      if (saved) { try { return JSON.parse(saved); } catch (e) {} }
+      return [];
     }
+    function setData(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 
     function handleLogin(e) {
       e.preventDefault();
       const enteredPass = document.getElementById('adminPasswordInput').value.trim();
       const savedPass = localStorage.getItem('turkmc_admin_password');
 
-      // Gizli anahtar: 'turkmc2026' VEYA belirlediğiniz özel şifre her zaman geçerlidir
       if (enteredPass === 'turkmc2026' || (savedPass && enteredPass === savedPass.trim())) {
         sessionStorage.setItem('turkmc_admin_logged_in', 'true');
         showDashboard();
@@ -509,7 +247,8 @@
       document.getElementById('loginErrorMsg').style.display = 'none';
     }
 
-    function switchTab(tab) {
+    function switchMainTab(tab) {
+      currentMainTab = tab;
       document.getElementById('sectionPending').style.display = tab === 'pending' ? 'block' : 'none';
       document.getElementById('sectionLive').style.display = tab === 'live' ? 'block' : 'none';
       document.getElementById('sectionSettings').style.display = tab === 'settings' ? 'block' : 'none';
@@ -517,242 +256,300 @@
       document.getElementById('tabBtnPending').classList.toggle('active', tab === 'pending');
       document.getElementById('tabBtnLive').classList.toggle('active', tab === 'live');
       document.getElementById('tabBtnSettings').classList.toggle('active', tab === 'settings');
-    }
-
-    function getPendingServers() {
-      const data = localStorage.getItem('turkmc_pending_servers');
-      return data ? JSON.parse(data) : [];
-    }
-
-    function getLiveServers() {
-      const data = localStorage.getItem('turkmc_approved_servers');
-      return data ? JSON.parse(data) : [];
-    }
-
-    async function syncDashboardWithApi() {
-      try {
-        const [resPending, resApproved] = await Promise.all([
-          fetch('/api/admin/pending'),
-          fetch('/api/servers')
-        ]);
-        if (resPending.ok) {
-          const remotePending = await resPending.json();
-          if (Array.isArray(remotePending)) {
-            localStorage.setItem('turkmc_pending_servers', JSON.stringify(remotePending));
-          }
-        }
-        if (resApproved.ok) {
-          const remoteApproved = await resApproved.json();
-          if (Array.isArray(remoteApproved) && remoteApproved.length > 0) {
-            localStorage.setItem('turkmc_approved_servers', JSON.stringify(remoteApproved));
-          }
-        }
-        loadDashboardData();
-      } catch (err) {}
-    }
-
-    function loadDashboardData() {
-      const pending = getPendingServers();
-      const live = getLiveServers();
-
-      document.getElementById('statPendingCount').textContent = pending.length;
-      document.getElementById('statLiveCount').textContent = live.length;
-      document.getElementById('statTotalCount').textContent = pending.length + live.length;
-      document.getElementById('tabBadgePending').textContent = pending.length;
-
-      renderPendingList(pending);
-      renderLiveList(live);
-    }
-
-    function renderPendingList(list) {
-      const container = document.getElementById('pendingListContainer');
-      if (list.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 3rem; background: rgba(15, 23, 42, 0.6); border-radius: 16px; border: 1px dashed rgba(255, 255, 255, 0.1);">
-            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🎉</div>
-            <h4 style="font-size: 1.1rem; font-weight: 700;">Onay bekleyen başvuru bulunmuyor.</h4>
-            <p style="color: #64748b; font-size: 0.85rem;">Yeni bir sunucu eklendiğinde burada görüntülenecektir.</p>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = list.map(item => `
-        <div class="application-card" id="app-${item.id}">
-          <div class="app-banner-row">
-            <img src="${item.banner}" class="app-banner-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'">
-          </div>
-          <div class="app-content-body">
-            <div class="app-header">
-              <div>
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff;">${item.name}</h3>
-                <p style="color: #fbbf24; font-size: 0.88rem; font-weight: 600;">${item.slogan || ''}</p>
-              </div>
-              <span style="background: rgba(6, 182, 212, 0.2); color: #38bdf8; padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">
-                ${item.category}
-              </span>
-            </div>
-
-            <div class="app-specs">
-              <div><strong>IP:</strong> ${item.ip}</div>
-              <div><strong>Sürüm:</strong> ${item.version}</div>
-              <div><strong>Kapasite:</strong> ${item.slot || 'Belirtilmedi'}</div>
-              <div><strong>Zorluk:</strong> ${item.difficulty || 'Standart'}</div>
-            </div>
-
-            <div style="background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 8px; font-size: 0.88rem; color: #cbd5e1; white-space: pre-line;">
-              <strong>Tanıtım Metni:</strong><br>${item.description}
-            </div>
-
-            <div class="app-actions">
-              <span style="margin-right: auto; font-size: 0.8rem; color: #64748b;">Başvuru Tarihi: ${item.appliedAt || 'Bugün'}</span>
-              <button class="btn btn-danger" onclick="rejectApplication('${item.id}')">
-                ✕ Reddet / Sil
-              </button>
-              <button class="btn btn-success" onclick="approveApplication('${item.id}')">
-                ✓ Kabul Et (Yayına Al)
-              </button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderLiveList(list) {
-      const container = document.getElementById('liveListContainer');
-      if (list.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 3rem; background: rgba(15, 23, 42, 0.5); border-radius: 14px; border: 1px dashed rgba(255, 255, 255, 0.1);">
-            <div style="font-size: 2rem; margin-bottom: 0.4rem;">✨</div>
-            <h4 style="font-size: 1.1rem; font-weight: 700;">Şu anda yayında hiçbir sunucu bulunmuyor.</h4>
-            <p style="color: #64748b; font-size: 0.85rem;">Yeni başvuruları onayladıkça burada listelenecektir.</p>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = list.map(item => `
-        <div class="application-card" style="margin-bottom: 1rem;">
-          <div class="app-content-body" style="padding: 1.2rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <img src="${item.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + item.name}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.src='https://api.dicebear.com/7.x/identicon/svg?seed=mc'">
-                <div>
-                  <h4 style="font-size: 1.1rem; font-weight: 800;">${item.name}</h4>
-                  <span style="font-size: 0.82rem; color: #fbbf24; font-family: monospace;">${item.ip}</span>
-                </div>
-              </div>
-              <div style="display: flex; align-items: center; gap: 0.6rem;">
-                <button class="btn ${item.featured ? 'btn-gold' : 'btn-ghost'}" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;" onclick="toggleFeatured('${item.id}')">
-                  ${item.featured ? '★ Öne Çıkarıldı' : '☆ Öne Çıkar'}
-                </button>
-                <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;" onclick="deleteLiveServer('${item.id}')">
-                  Kaldır / Sil
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    async function approveApplication(id) {
-      const pending = getPendingServers();
-      const target = pending.find(p => p.id === id);
-      if (!target) return;
-
-      const remainingPending = pending.filter(p => p.id !== id);
-      localStorage.setItem('turkmc_pending_servers', JSON.stringify(remainingPending));
-
-      const live = getLiveServers();
-      target.id = "srv-" + Date.now();
-      target.status = 'approved';
-      live.unshift(target);
-      localStorage.setItem('turkmc_approved_servers', JSON.stringify(live));
-
-      try {
-        await fetch('/api/admin/approve', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id })
-        });
-      } catch (e) {}
-
-      showToast(`✅ "${target.name}" sunucusu kabul edildi ve yayına alındı!`);
       loadDashboardData();
     }
 
-    async function rejectApplication(id) {
+    function switchPendingSubTab(sub) {
+      currentPendingSubTab = sub;
+      document.getElementById('subtabPendingServers').classList.toggle('active', sub === 'servers');
+      document.getElementById('subtabPendingClans').classList.toggle('active', sub === 'clans');
+      document.getElementById('subtabPendingTier').classList.toggle('active', sub === 'tierlist');
+      renderPendingList();
+    }
+
+    function switchLiveSubTab(sub) {
+      currentLiveSubTab = sub;
+      document.getElementById('subtabLiveServers').classList.toggle('active', sub === 'servers');
+      document.getElementById('subtabLiveClans').classList.toggle('active', sub === 'clans');
+      document.getElementById('subtabLiveTier').classList.toggle('active', sub === 'tierlist');
+      renderLiveList();
+    }
+
+    function loadDashboardData() {
+      const pendingServers = getData('turkmc_pending_servers');
+      const pendingClans = getData('turkmc_pending_clans');
+      const pendingTier = getData('turkmc_pending_tierlist');
+
+      const liveServers = getData('turkmc_approved_servers');
+      const liveClans = getData('turkmc_approved_clans');
+      const liveTier = getData('turkmc_approved_tierlist');
+
+      const totalPending = pendingServers.length + pendingClans.length + pendingTier.length;
+
+      document.getElementById('statPendingTotalCount').textContent = totalPending;
+      document.getElementById('statServerCount').textContent = liveServers.length;
+      document.getElementById('statClanCount').textContent = liveClans.length;
+      document.getElementById('statTierCount').textContent = liveTier.length;
+
+      document.getElementById('tabBadgePending').textContent = totalPending;
+      document.getElementById('countPendingServers').textContent = pendingServers.length;
+      document.getElementById('countPendingClans').textContent = pendingClans.length;
+      document.getElementById('countPendingTier').textContent = pendingTier.length;
+
+      document.getElementById('countLiveServers').textContent = liveServers.length;
+      document.getElementById('countLiveClans').textContent = liveClans.length;
+      document.getElementById('countLiveTier').textContent = liveTier.length;
+
+      if (currentMainTab === 'pending') renderPendingList();
+      else if (currentMainTab === 'live') renderLiveList();
+    }
+
+    function renderPendingList() {
+      const container = document.getElementById('pendingListContainer');
+
+      if (currentPendingSubTab === 'servers') {
+        const list = getData('turkmc_pending_servers');
+        if (list.length === 0) { container.innerHTML = getEmptyState("🎮 Bekleyen Minecraft sunucu başvurusu yok."); return; }
+        container.innerHTML = list.map(item => `
+          <div class="application-card">
+            <div class="app-banner-row"><img src="${item.banner || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'}" class="app-banner-img"></div>
+            <div class="app-content-body">
+              <div class="app-header">
+                <div><h3 style="font-size: 1.3rem; font-weight: 800; color: #fff;">${item.name}</h3><p style="color: #fbbf24; font-size: 0.88rem;">${item.slogan || ''}</p></div>
+                <span style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">${item.category}</span>
+              </div>
+              <div class="app-specs">
+                <div><strong>IP:</strong> ${item.ip}</div><div><strong>Sürüm:</strong> ${item.version}</div>
+                <div><strong>Discord:</strong> ${item.discord ? `<a href="${item.discord}" target="_blank" style="color:#5865f2;">Link</a>` : 'Yok'}</div>
+                <div><strong>Tarih:</strong> ${item.appliedAt || 'Bugün'}</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.25); padding: 0.8rem; border-radius: 8px; font-size: 0.88rem; color: #cbd5e1; white-space: pre-line; margin-bottom: 1rem;">
+                <strong>Tanıtım Metni:</strong><br>${item.description}
+              </div>
+              <div class="app-actions">
+                <button class="btn btn-danger" onclick="rejectItem('turkmc_pending_servers', '${item.id}')">✕ Reddet / Sil</button>
+                <button class="btn btn-success" onclick="approveServer('${item.id}')">✓ Kabul Et (Yayına Al)</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+      } else if (currentPendingSubTab === 'clans') {
+        const list = getData('turkmc_pending_clans');
+        if (list.length === 0) { container.innerHTML = getEmptyState("⚔️ Bekleyen klan başvurusu yok."); return; }
+        container.innerHTML = list.map(item => `
+          <div class="application-card">
+            <div class="app-banner-row"><img src="${item.banner || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'}" class="app-banner-img"></div>
+            <div class="app-content-body">
+              <div class="app-header">
+                <div><h3 style="font-size: 1.3rem; font-weight: 800; color: #fff;">${item.name} <span style="color:#c084fc;">${item.tag}</span></h3><p style="color: #c084fc; font-size: 0.88rem;">${item.slogan || ''}</p></div>
+                <span style="background: rgba(168, 85, 247, 0.2); color: #c084fc; padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">${item.gamemode || 'PvP'}</span>
+              </div>
+              <div class="app-specs">
+                <div><strong>Lider:</strong> ${item.leader}</div><div><strong>Üye:</strong> ${item.members}</div>
+                <div><strong>Discord:</strong> <a href="${item.discord}" target="_blank" style="color:#5865f2;">Link</a></div>
+                <div><strong>Tarih:</strong> ${item.appliedAt || 'Bugün'}</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.25); padding: 0.8rem; border-radius: 8px; font-size: 0.88rem; color: #cbd5e1; white-space: pre-line; margin-bottom: 1rem;">
+                <strong>Klan Açıklaması:</strong><br>${item.description}
+              </div>
+              <div class="app-actions">
+                <button class="btn btn-danger" onclick="rejectItem('turkmc_pending_clans', '${item.id}')">✕ Reddet / Sil</button>
+                <button class="btn btn-success" onclick="approveClan('${item.id}')">✓ Kabul Et (Yayına Al)</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+      } else if (currentPendingSubTab === 'tierlist') {
+        const list = getData('turkmc_pending_tierlist');
+        if (list.length === 0) { container.innerHTML = getEmptyState("🏆 Bekleyen Tierlist başvurusu yok."); return; }
+        container.innerHTML = list.map(item => `
+          <div class="application-card">
+            <div class="app-banner-row"><img src="${item.banner || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'}" class="app-banner-img"></div>
+            <div class="app-content-body">
+              <div class="app-header">
+                <div><h3 style="font-size: 1.3rem; font-weight: 800; color: #fff;">${item.name}</h3><p style="color: #fb7185; font-size: 0.88rem;">${item.slogan || ''}</p></div>
+                <span style="background: rgba(244, 63, 94, 0.2); color: #fb7185; padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">${item.category}</span>
+              </div>
+              <div class="app-specs">
+                <div><strong>Yetkili:</strong> ${item.owner}</div><div><strong>Kategori:</strong> ${item.category}</div>
+                <div><strong>Discord:</strong> <a href="${item.discord}" target="_blank" style="color:#5865f2;">Link</a></div>
+                <div><strong>Tarih:</strong> ${item.appliedAt || 'Bugün'}</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.25); padding: 0.8rem; border-radius: 8px; font-size: 0.88rem; color: #cbd5e1; white-space: pre-line; margin-bottom: 1rem;">
+                <strong>Açıklama:</strong><br>${item.description}
+              </div>
+              <div class="app-actions">
+                <button class="btn btn-danger" onclick="rejectItem('turkmc_pending_tierlist', '${item.id}')">✕ Reddet / Sil</button>
+                <button class="btn btn-success" onclick="approveTier('${item.id}')">✓ Kabul Et (Yayına Al)</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function renderLiveList() {
+      const container = document.getElementById('liveListContainer');
+
+      if (currentLiveSubTab === 'servers') {
+        const list = getData('turkmc_approved_servers');
+        if (list.length === 0) { container.innerHTML = getEmptyState("Yayında Minecraft sunucusu bulunmuyor."); return; }
+        container.innerHTML = list.map(item => `
+          <div class="application-card" style="margin-bottom: 1rem;">
+            <div class="app-content-body" style="padding: 1.2rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <img src="${item.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + item.name}" style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover;">
+                  <div><h4 style="font-size: 1.1rem; font-weight: 800;">${item.name}</h4><span style="font-size: 0.82rem; color: #fbbf24; font-family: monospace;">${item.ip} (${item.category})</span></div>
+                </div>
+                <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;" onclick="deleteLiveItem('turkmc_approved_servers', '${item.id}')">Yayından Kaldır</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+      } else if (currentLiveSubTab === 'clans') {
+        const list = getData('turkmc_approved_clans');
+        if (list.length === 0) { container.innerHTML = getEmptyState("Yayında klan bulunmuyor."); return; }
+        container.innerHTML = list.map(item => `
+          <div class="application-card" style="margin-bottom: 1rem;">
+            <div class="app-content-body" style="padding: 1.2rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 44px; height: 44px; border-radius: 8px; background: rgba(168,85,247,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">⚔️</div>
+                  <div><h4 style="font-size: 1.1rem; font-weight: 800;">${item.name} <span style="color:#c084fc;">${item.tag}</span></h4><span style="font-size: 0.82rem; color: #c084fc;">👑 Lider: ${item.leader} | 👥 Üye: ${item.members}</span></div>
+                </div>
+                <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;" onclick="deleteLiveItem('turkmc_approved_clans', '${item.id}')">Yayından Kaldır</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+      } else if (currentLiveSubTab === 'tierlist') {
+        const list = getData('turkmc_approved_tierlist');
+        if (list.length === 0) { container.innerHTML = getEmptyState("Yayında Tierlist sunucusu bulunmuyor."); return; }
+        container.innerHTML = list.map(item => `
+          <div class="application-card" style="margin-bottom: 1rem;">
+            <div class="app-content-body" style="padding: 1.2rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 44px; height: 44px; border-radius: 8px; background: rgba(244,63,94,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🏆</div>
+                  <div><h4 style="font-size: 1.1rem; font-weight: 800;">${item.name}</h4><span style="font-size: 0.82rem; color: #fbbf24;">Kategori: ${item.category} | Yetkili: ${item.owner}</span></div>
+                </div>
+                <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;" onclick="deleteLiveItem('turkmc_approved_tierlist', '${item.id}')">Yayından Kaldır</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function getEmptyState(text) {
+      return `
+        <div style="text-align: center; padding: 3rem; background: rgba(15, 23, 42, 0.6); border-radius: 16px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+          <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🎉</div>
+          <h4 style="font-size: 1.1rem; font-weight: 700;">${text}</h4>
+          <p style="color: #64748b; font-size: 0.85rem;">Yeni bir başvuru yapıldığında otomatik burada listelenecektir.</p>
+        </div>
+      `;
+    }
+
+    function approveServer(id) {
+      const pending = getData('turkmc_pending_servers');
+      const target = pending.find(p => p.id === id);
+      if (!target) return;
+      setData('turkmc_pending_servers', pending.filter(p => p.id !== id));
+      const live = getData('turkmc_approved_servers');
+      target.id = "srv-" + Date.now();
+      target.status = 'approved';
+      live.unshift(target);
+      setData('turkmc_approved_servers', live);
+      showToast(`✅ "${target.name}" sunucusu yayına alındı!`);
+      loadDashboardData();
+    }
+
+    function approveClan(id) {
+      const pending = getData('turkmc_pending_clans');
+      const target = pending.find(p => p.id === id);
+      if (!target) return;
+      setData('turkmc_pending_clans', pending.filter(p => p.id !== id));
+      const live = getData('turkmc_approved_clans');
+      target.id = "clan-" + Date.now();
+      target.status = 'approved';
+      live.unshift(target);
+      setData('turkmc_approved_clans', live);
+      showToast(`⚔️ "${target.name}" klanı yayına alındı!`);
+      loadDashboardData();
+    }
+
+    function approveTier(id) {
+      const pending = getData('turkmc_pending_tierlist');
+      const target = pending.find(p => p.id === id);
+      if (!target) return;
+      setData('turkmc_pending_tierlist', pending.filter(p => p.id !== id));
+      const live = getData('turkmc_approved_tierlist');
+      target.id = "tier-" + Date.now();
+      target.status = 'approved';
+      live.unshift(target);
+      setData('turkmc_approved_tierlist', live);
+      showToast(`🏆 "${target.name}" Tierlist sunucusu yayına alındı!`);
+      loadDashboardData();
+    }
+
+    function rejectItem(key, id) {
       if (!confirm("Bu başvuruyu reddetmek ve silmek istediğinize emin misiniz?")) return;
-      const pending = getPendingServers();
-      const remaining = pending.filter(p => p.id !== id);
-      localStorage.setItem('turkmc_pending_servers', JSON.stringify(remaining));
-
-      try {
-        await fetch('/api/admin/reject', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id })
-        });
-      } catch (e) {}
-
+      setData(key, getData(key).filter(p => p.id !== id));
       showToast("❌ Başvuru reddedildi ve silindi.");
       loadDashboardData();
     }
 
-    function deleteLiveServer(id) {
-      if (!confirm("Bu sunucuyu yayından kaldırmak istediğinize emin misiniz?")) return;
-      const live = getLiveServers().filter(s => s.id !== id);
-      localStorage.setItem('turkmc_approved_servers', JSON.stringify(live));
-
-      showToast("Sunucu yayından kaldırıldı.");
+    function deleteLiveItem(key, id) {
+      if (!confirm("Bu kaydı yayından kaldırmak istediğinize emin misiniz?")) return;
+      setData(key, getData(key).filter(s => s.id !== id));
+      showToast("Kayıt yayından kaldırıldı.");
       loadDashboardData();
-    }
-
-    function toggleFeatured(id) {
-      const live = getLiveServers();
-      const item = live.find(s => s.id === id);
-      if (item) {
-        item.featured = !item.featured;
-        localStorage.setItem('turkmc_approved_servers', JSON.stringify(live));
-        loadDashboardData();
-        showToast(item.featured ? "Sunucu öne çıkarıldı!" : "Öne çıkarma kaldırıldı.");
-      }
     }
 
     function handleChangePassword(e) {
       e.preventDefault();
       const newPass = document.getElementById('newAdminPassword').value.trim();
-      if (newPass.length < 4) {
-        alert("Şifre en az 4 karakter olmalıdır!");
-        return;
-      }
+      if (newPass.length < 4) { alert("Şifre en az 4 karakter olmalıdır!"); return; }
       localStorage.setItem('turkmc_admin_password', newPass);
       document.getElementById('newAdminPassword').value = '';
-      showToast("🔑 Yönetici şifreniz başarıyla güncellendi!");
+      showToast("🔑 Yönetici şifreniz güncellendi!");
     }
 
     function exportDataJson() {
       const data = {
-        approved: getLiveServers(),
-        pending: getPendingServers(),
+        servers: getData('turkmc_approved_servers'),
+        pending_servers: getData('turkmc_pending_servers'),
+        clans: getData('turkmc_approved_clans'),
+        pending_clans: getData('turkmc_pending_clans'),
+        tierlist: getData('turkmc_approved_tierlist'),
+        pending_tierlist: getData('turkmc_pending_tierlist'),
         exportedAt: new Date().toISOString()
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `turkmc_sunucu_yedek_${Date.now()}.json`;
+      a.download = `turkmc_topluluk_yedek_${Date.now()}.json`;
       a.click();
       URL.revokeObjectURL(url);
     }
 
-    function clearAllServers() {
-      if (!confirm("Tüm sunucuları silmek ve listeyi tamamen temizlemek istediğinize emin misiniz?")) return;
-      localStorage.setItem('turkmc_approved_servers', JSON.stringify([]));
-      localStorage.setItem('turkmc_pending_servers', JSON.stringify([]));
+    function clearAllData() {
+      if (!confirm("Tüm verileri silmek istediğinize emin misiniz?")) return;
+      localStorage.removeItem('turkmc_approved_servers');
+      localStorage.removeItem('turkmc_pending_servers');
+      localStorage.removeItem('turkmc_approved_clans');
+      localStorage.removeItem('turkmc_pending_clans');
+      localStorage.removeItem('turkmc_approved_tierlist');
+      localStorage.removeItem('turkmc_pending_tierlist');
       loadDashboardData();
-      showToast("Tüm sunucular temizlendi, liste artık bomboş!");
+      showToast("Tüm veriler sıfırlandı.");
     }
 
     function showToast(msg) {
@@ -763,10 +560,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      if (sessionStorage.getItem('turkmc_admin_logged_in') === 'true') {
-        showDashboard();
-      }
-      syncDashboardWithApi();
+      if (sessionStorage.getItem('turkmc_admin_logged_in') === 'true') showDashboard();
     });
   </script>
 </body>
