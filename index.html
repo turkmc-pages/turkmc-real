@@ -1,174 +1,1536 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TURKMC - Türk Minecraft Sunucuları</title>
-<style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#eee;background:#111;min-height:100vh}
-body:before{content:"";position:fixed;inset:0;background:linear-gradient(135deg,#111 0%,#1b1405 55%,#090909 100%);z-index:-2}
-.wrap{width:min(1100px,94%);margin:0 auto;padding:40px 0}
-.card{background:rgba(20,20,20,.94);border:1px solid #8f6a20;border-radius:16px;padding:24px;box-shadow:0 10px 35px #0008;margin-bottom:20px}
-h1,h2{color:#f5c542;margin-top:0}
-input,select,textarea{width:100%;padding:12px;margin:7px 0 14px;background:#111;color:#fff;border:1px solid #555;border-radius:8px;font-family:inherit}
-textarea{min-height:100px;resize:vertical}
-button{border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer;background:#d9a927;color:#111;margin:4px 4px 4px 0}
-button.gray{background:#444;color:#fff}
-.hidden{display:none}
-.msg{padding:12px;border-radius:8px;margin:10px 0}.err{background:#481c1c}.ok{background:#173c22}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px}
-.server{border:1px solid #444;border-radius:12px;padding:16px;background:#181818}
-.small{color:#aaa;font-size:13px}
-.tag{display:inline-block;border:1px solid #8f6a20;border-radius:20px;padding:4px 9px;color:#f5c542;font-size:12px;margin-bottom:8px}
-.top{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
-a{color:#f5c542}
-.tabs{display:flex;flex-wrap:wrap;gap:8px}
-.tab{background:#181818;border:1px solid #444;color:#ccc;font-weight:400;padding:8px 14px;border-radius:20px;margin:0;cursor:pointer}
-.tab.active{background:#d9a927;color:#111;border-color:#d9a927;font-weight:700}
-.ip-row{display:flex;align-items:center;gap:8px;margin:8px 0}
-.ip-row code{background:#111;border:1px solid #444;border-radius:6px;padding:6px 10px;flex:1;overflow-x:auto;white-space:nowrap;font-size:13px}
-.ip-row button{margin:0;padding:6px 10px;font-size:12px}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <div class="card top">
-    <div>
-      <h1 style="margin:0">⛏️ TURKMC</h1>
-      <span class="small">Türk Minecraft sunucularını keşfet, kendi sunucunu / klanını paylaş.</span>
-    </div>
-    <button onclick="toggleForm()">+ Sunucu Ekle</button>
-  </div>
-
-  <div id="formCard" class="card hidden">
-    <h2>Sunucu Başvurusu</h2>
-    <div id="formMsg"></div>
-    <input id="fName" placeholder="Sunucu / klan adı">
-    <input id="fIp" placeholder="IP (örn: play.sunucu.com)">
-    <select id="fType"></select>
-    <input id="fWebsite" placeholder="Discord / Web sitesi (opsiyonel)">
-    <textarea id="fDesc" placeholder="Açıklama"></textarea>
-    <button onclick="submitServer()">Gönder</button>
-    <p class="small">Başvurun admin onayından sonra listede yayınlanır.</p>
-  </div>
-
-  <div class="card">
-    <div id="tabs" class="tabs"></div>
-  </div>
-
-  <div id="servers" class="grid"><p class="small">Yükleniyor...</p></div>
-</div>
-
-<script>
-const TYPES=["Survival","SkyBlock","Factions","Towny","TrapPvP","PvP","BedWars","Pixelmon","Klan","Tier List","Diğer"];
-let ALL=[];
-let activeType="Tümü";
-
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-
-function toggleForm(){
-  document.getElementById("formCard").classList.toggle("hidden");
-}
-
-function renderTabs(){
-  const tabs=["Tümü",...TYPES];
-  document.getElementById("tabs").innerHTML=tabs.map(t=>
-    `<button class="tab ${t===activeType?'active':''}" onclick="setType('${esc(t)}')">${esc(t)}</button>`
-  ).join("");
-}
-
-function setType(t){
-  activeType=t;
-  renderTabs();
-  renderServers();
-}
-
-function renderServers(){
-  const list=activeType==="Tümü"?ALL:ALL.filter(s=>s.type===activeType);
-  const box=document.getElementById("servers");
-
-  if(!list.length){
-    box.innerHTML="<p class='small'>Bu kategoride henüz sunucu yok.</p>";
-    return;
-  }
-
-  box.innerHTML=list.map(s=>`
-    <div class="server">
-      <div class="tag">${esc(s.type)}</div>
-      <h3 style="margin:6px 0">${esc(s.name)}</h3>
-      <div class="ip-row">
-        <code>${esc(s.ip)}</code>
-        <button class="gray" onclick="copyIp('${esc(s.ip)}',this)">Kopyala</button>
-      </div>
-      <p>${esc(s.description||"")}</p>
-      ${s.website?`<div><a href="${esc(s.website)}" target="_blank" rel="noopener">Discord / Web sitesi</a></div>`:""}
-    </div>`).join("");
-}
-
-function copyIp(ip,btn){
-  navigator.clipboard.writeText(ip).then(()=>{
-    const old=btn.textContent;
-    btn.textContent="Kopyalandı!";
-    setTimeout(()=>btn.textContent=old,1500);
-  }).catch(()=>{});
-}
-
-async function loadServers(){
-  try{
-    const r=await fetch("/api/servers");
-    ALL=await r.json();
-  }catch(err){
-    ALL=[];
-  }
-  renderServers();
-}
-
-function fillTypeSelect(){
-  document.getElementById("fType").innerHTML=TYPES.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join("");
-}
-
-async function submitServer(){
-  const name=document.getElementById("fName").value.trim();
-  const ip=document.getElementById("fIp").value.trim();
-  const type=document.getElementById("fType").value;
-  const website=document.getElementById("fWebsite").value.trim();
-  const description=document.getElementById("fDesc").value.trim();
-  const box=document.getElementById("formMsg");
-
-  box.innerHTML="";
-
-  if(!name||!ip){
-    box.innerHTML='<div class="msg err">Sunucu adı ve IP zorunludur.</div>';
-    return;
-  }
-
-  try{
-    const r=await fetch("/api/servers",{
-      method:"POST",
-      headers:{"content-type":"application/json"},
-      body:JSON.stringify({name,ip,type,website,description})
-    });
-
-    const data=await r.json().catch(()=>({}));
-
-    if(!r.ok){
-      box.innerHTML='<div class="msg err">'+esc(data.error||"Başvuru gönderilemedi.")+'</div>';
-      return;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TÜRKMC - Minecraft Türkiye Topluluğu | Sunucu Tanıtımları</title>
+  <meta name="description" content="Türkiye'nin en aktif Minecraft sunucu tanıtım platformu. Ücretsiz sunucunu ekle, oyunculara ulaş!">
+  
+  <!-- Google Yazı Tipleri -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       TÜRKMC Temel Tasarım Sistemi & Cam Efektleri
+       ========================================================================== */
+    :root {
+      --primary-gold: #f59e0b;
+      --primary-gold-hover: #fbbf24;
+      --gold-glow: rgba(245, 158, 11, 0.4);
+      --bg-dark: #0a0d14;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --discord-blurple: #5865F2;
+      --discord-hover: #4752c4;
     }
 
-    box.innerHTML='<div class="msg ok">'+esc(data.message||"Başvurun alındı.")+'</div>';
-    document.getElementById("fName").value="";
-    document.getElementById("fIp").value="";
-    document.getElementById("fWebsite").value="";
-    document.getElementById("fDesc").value="";
-  }catch(err){
-    box.innerHTML='<div class="msg err">Bağlantı hatası, tekrar dene.</div>';
-  }
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-renderTabs();
-fillTypeSelect();
-loadServers();
-</script>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Arka Plan Görseli */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background: 
+        linear-gradient(180deg, rgba(10, 13, 20, 0.78) 0%, rgba(10, 13, 20, 0.92) 55%, #0a0d14 100%),
+        url('background.png') center center / cover no-repeat,
+        url('https://images.unsplash.com/photo-1627856013091-fed6e4e30025?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    .bg-glow-layer {
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1100px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(6, 182, 212, 0.06) 50%, transparent 75%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Üst Menü (Navbar) */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 13, 20, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .logo-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .crown-icon {
+      width: 34px;
+      height: 34px;
+      filter: drop-shadow(0 2px 8px var(--gold-glow));
+    }
+
+    .brand-text {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, #fde047 0%, #f59e0b 60%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      list-style: none;
+    }
+
+    .nav-item {
+      position: relative;
+    }
+
+    .nav-link {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.925rem;
+      font-weight: 600;
+      padding: 0.55rem 0.95rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Açılır Kategori Menüsü (Görsel 5 Stili) */
+    .dropdown-content {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 260px;
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 0.6rem;
+      display: none;
+      flex-direction: column;
+      gap: 0.2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      z-index: 150;
+    }
+
+    .nav-item:hover .dropdown-content {
+      display: flex;
+    }
+
+    .dropdown-link {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .dropdown-link:hover {
+      color: #fff;
+      background: rgba(245, 158, 11, 0.15);
+      transform: translateX(4px);
+    }
+
+    .cat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-gold);
+      display: inline-block;
+      margin-right: 0.5rem;
+    }
+
+    /* Butonlar */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border-radius: 10px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.25s ease;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #0f172a;
+      box-shadow: 0 4px 14px var(--gold-glow);
+    }
+
+    .btn-gold:hover {
+      background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.55);
+    }
+
+    .btn-discord {
+      background: var(--discord-blurple);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(88, 101, 242, 0.35);
+    }
+
+    .btn-discord:hover {
+      background: var(--discord-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(88, 101, 242, 0.55);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* Hero Bölümü */
+    .hero-section {
+      text-align: center;
+      padding: 4rem 1.5rem 2rem;
+      max-width: 1050px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1.1rem;
+      border-radius: 100px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+    }
+
+    .hero-title {
+      font-size: 3.2rem;
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #fde047 0%, #f59e0b 60%, #f97316 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 700px;
+      margin: 0 auto 2.2rem;
+    }
+
+    /* Arama Çubuğu */
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      max-width: 720px;
+      margin: 0 auto;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(20px);
+      padding: 0.5rem 0.6rem 0.5rem 1.25rem;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+    }
+
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .search-input::placeholder {
+      color: #64748b;
+    }
+
+    /* Kategori Butonları (Yatay Kaydırma) */
+    .categories-wrap {
+      max-width: 1400px;
+      margin: 2.2rem auto 2.5rem;
+      padding: 0 1.5rem;
+    }
+
+    .categories-scroll {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      overflow-x: auto;
+      padding-bottom: 0.8rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(245, 158, 11, 0.4) transparent;
+    }
+
+    .cat-filter-btn {
+      white-space: nowrap;
+      padding: 0.6rem 1.15rem;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .cat-filter-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .cat-filter-btn.active {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.08) 100%);
+      border-color: var(--primary-gold);
+      color: #fbbf24;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
+    }
+
+    /* Ana İçerik / Grid */
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1.5rem 5rem;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .server-count-badge {
+      font-size: 0.8rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 100px;
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    /* Sunucu Banner Izgarası (Görsel 3 mc-tr tarzı yatay afişler) */
+    .server-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.35rem;
+    }
+
+    @media (max-width: 980px) {
+      .server-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sunucu Kartı */
+    .server-card {
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .server-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(245, 158, 11, 0.5);
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.55), 0 0 22px rgba(245, 158, 11, 0.18);
+    }
+
+    .featured-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 5;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #0f172a;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .server-banner-container {
+      width: 100%;
+      height: 125px;
+      position: relative;
+      background: #0f172a;
+      overflow: hidden;
+    }
+
+    .server-banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .server-card:hover .server-banner-img {
+      transform: scale(1.03);
+    }
+
+    .server-banner-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.1) 0%, rgba(15, 23, 42, 0.95) 100%);
+    }
+
+    .server-content {
+      padding: 1.1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      flex: 1;
+    }
+
+    .server-header-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .server-identity {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .server-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .server-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .server-category {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      background: rgba(6, 182, 212, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .server-tags {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .tag-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+    }
+
+    .status-live {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      display: inline-block;
+    }
+
+    /* IP & Eylem Çubuğu */
+    .server-actions-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 10px;
+      padding: 0.55rem 0.85rem;
+      margin-top: auto;
+    }
+
+    .server-ip-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      color: #fbbf24;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn-copy-ip {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #e2e8f0;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      white-space: nowrap;
+    }
+
+    .btn-copy-ip:hover {
+      background: var(--primary-gold);
+      color: #0f172a;
+    }
+
+    /* Discord Tanıtım Alanı (Görsel 1 Alt Kısmı) */
+    .discord-section {
+      margin-top: 4rem;
+      background: linear-gradient(135deg, rgba(88, 101, 242, 0.24) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 1px solid rgba(88, 101, 242, 0.4);
+      border-radius: 20px;
+      padding: 2.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(88, 101, 242, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .discord-section {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    .discord-info-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .discord-big-avatar {
+      width: 64px;
+      height: 64px;
+      background: var(--discord-blurple);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(88, 101, 242, 0.4);
+      flex-shrink: 0;
+    }
+
+    .discord-big-avatar svg {
+      width: 38px;
+      height: 38px;
+      fill: #fff;
+    }
+
+    /* Modallar (Popup Pencereleri) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(14px);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 820px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+      position: relative;
+      animation: modalShow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalShow {
+      from { opacity: 0; transform: scale(0.96) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-close-icon {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: rgba(255, 255, 255, 0.12);
+      border: none;
+      color: #cbd5e1;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 20;
+      transition: all 0.2s;
+    }
+
+    .modal-close-icon:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: #ef4444;
+    }
+
+    /* Sunucu Detay Modalı (Görsel 4 formatı) */
+    .modal-banner-box {
+      width: 100%;
+      height: 200px;
+      position: relative;
+      background: #1e293b;
+    }
+
+    .modal-banner-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .modal-detail-head {
+      padding: 1.5rem 2rem 0;
+      display: flex;
+      align-items: flex-end;
+      gap: 1.25rem;
+      margin-top: -50px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .modal-detail-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 18px;
+      border: 3px solid #0f172a;
+      background: #1e293b;
+      object-fit: cover;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-detail-body {
+      padding: 1.5rem 2rem 2rem;
+    }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.9rem;
+      margin: 1.25rem 0;
+    }
+
+    @media (max-width: 650px) {
+      .specs-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .spec-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+    }
+
+    .spec-card .lbl {
+      font-size: 0.75rem;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .spec-card .val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .detail-story-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 1.25rem;
+      font-size: 0.94rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+      white-space: pre-line;
+      margin: 1.25rem 0;
+    }
+
+    /* Form Girişleri (Sunucu Ekle) */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary-gold);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-desc-hint {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 0.3rem;
+    }
+
+    /* Toast Bildirim */
+    .toast-box {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #10b981;
+      color: #fff;
+      padding: 0.8rem 1.4rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
+      z-index: 999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toast-box.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      background: #07090e;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.875rem;
+    }
+
+    .footer-brand {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #fbbf24;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Arka Plan Görseli Katmanı -->
+  <div class="bg-layer"></div>
+  <div class="bg-glow-layer"></div>
+
+  <!-- Üst Menü / Navbar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo-brand">
+        <!-- Taç Simgesi -->
+        <svg class="crown-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" fill="#F59E0B" stroke="#FDE047" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M5 19H19V17H5V19Z" fill="#D97706"/>
+        </svg>
+        <span class="brand-text">TÜRKMC</span>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="index.html" class="nav-link active">Ana Sayfa</a>
+          </li>
+          
+          <!-- Sunucu Kategorileri Açılır Menüsü (Görsel 5) -->
+          <li class="nav-item">
+            <a class="nav-link">
+              Minecraft Sunucuları ▾
+            </a>
+            <div class="dropdown-content">
+              <a class="dropdown-link" onclick="filterByCategory('all')"><span><span class="cat-dot"></span>Tüm Sunucular</span></a>
+              <a class="dropdown-link" onclick="filterByCategory('Hub')"><span><span class="cat-dot"></span>Hub Sunucuları</span></a>
+              <a class="dropdown-link" onclick="filterByCategory('Skyblock')"><span><span class="cat-dot"></span>Skyblock Sunucular</span></a>
+              <a class="dropdown-link" onclick="filterByCategory('Survival')"><span><span class="cat-dot"></span>Survival Sunucular</span></a>
+              <a class="dropdown-link" onclick="filterByCategory('Towny')"><span><span class="cat-dot"></span>Towny Sunucular</span></a>
+              <a class="dropdown-link" onclick="filterByCategory('PvP')"><span><span class="cat-dot"></span>PvP Sunucular</span></a>
+              <a class="dropdown-link" onclick="filterByCategory('Faction')"><span><span class="cat-dot"></span>Faction Sunucular</span></a>
+              <a class="dropdown-link" onclick="filterByCategory('Creative')"><span><span class="cat-dot"></span>Creative Sunucular</span></a>
+              <a class="dropdown-link" onclick="filterByCategory('RPG')"><span><span class="cat-dot"></span>RPG Sunucular</span></a>
+              <a class="dropdown-link" onclick="filterByCategory('ConCon')"><span><span class="cat-dot"></span>ConCon Sunucular</span></a>
+              <a class="dropdown-link" onclick="filterByCategory('BoxMining')"><span><span class="cat-dot"></span>BoxMining Sunucular</span></a>
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <a href="https://discord.gg/turkmc" target="_blank" class="nav-link">Discord</a>
+          </li>
+
+          <li class="nav-item">
+            <a href="admin.html" class="nav-link">Yönetim Paneli</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <button class="btn btn-gold" onclick="openAddModal()">
+          + Sunucunu Ücretsiz Ekle
+        </button>
+        <a href="https://discord.gg/turkmc" target="_blank" class="btn btn-discord">
+          Discord'a Katıl
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Bölümü -->
+  <section class="hero-section">
+    <div class="hero-badge">
+      👑 Minecraft Türkiye Topluluğu
+    </div>
+    <h1 class="hero-title">
+      En İyi Minecraft Sunucuları <span>TÜRKMC</span>'de!
+    </h1>
+    <p class="hero-subtitle">
+      Binlerce Türk oyuncunun buluştuğu nokta. Kendi sunucunu ücretsiz tanıt, yeni oyuncular kazan veya hemen yeni bir maceraya katıl!
+    </p>
+
+    <!-- Arama Çubuğu -->
+    <div class="search-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <input type="text" id="searchInput" class="search-input" placeholder="Sunucu adı, IP veya oyun türü ara..." oninput="handleSearch()">
+      <button class="btn btn-gold" style="padding: 0.55rem 1rem;" onclick="handleSearch()">Ara</button>
+    </div>
+  </section>
+
+  <!-- Kategori Filtre Butonları (Yatay Liste) -->
+  <div class="categories-wrap">
+    <div class="categories-scroll" id="categoriesScroll">
+      <button class="cat-filter-btn active" data-cat="all" onclick="filterByCategory('all')">Tümü</button>
+      <button class="cat-filter-btn" data-cat="Hub" onclick="filterByCategory('Hub')">Hub Sunucuları</button>
+      <button class="cat-filter-btn" data-cat="Skyblock" onclick="filterByCategory('Skyblock')">Skyblock</button>
+      <button class="cat-filter-btn" data-cat="Survival" onclick="filterByCategory('Survival')">Survival</button>
+      <button class="cat-filter-btn" data-cat="Towny" onclick="filterByCategory('Towny')">Towny</button>
+      <button class="cat-filter-btn" data-cat="PvP" onclick="filterByCategory('PvP')">PvP Sunucular</button>
+      <button class="cat-filter-btn" data-cat="Faction" onclick="filterByCategory('Faction')">Faction</button>
+      <button class="cat-filter-btn" data-cat="Creative" onclick="filterByCategory('Creative')">Creative</button>
+      <button class="cat-filter-btn" data-cat="RPG" onclick="filterByCategory('RPG')">RPG</button>
+      <button class="cat-filter-btn" data-cat="ConCon" onclick="filterByCategory('ConCon')">ConCon</button>
+      <button class="cat-filter-btn" data-cat="BoxMining" onclick="filterByCategory('BoxMining')">BoxMining</button>
+    </div>
+  </div>
+
+  <!-- Ana Sunucu Vitrini / Banner Izgarası -->
+  <main class="main-content">
+    <div class="section-head">
+      <h2 class="section-title">
+        🔥 Sunucu Vitrini (Banner Tanıtımları)
+        <span class="server-count-badge" id="serverCountBadge">0 Sunucu</span>
+      </h2>
+      <button class="btn btn-ghost" onclick="openAddModal()">
+        + Sunucu Ekle (Ücretsiz)
+      </button>
+    </div>
+
+    <!-- Sunucu Kartları Izgarası (Görsel 3 Tarzı) -->
+    <div class="server-grid" id="serverGrid">
+      <!-- JavaScript tarafından dinamik oluşturulacak -->
+    </div>
+
+    <!-- Discord Çağrı Bloğu (Görsel 1 Alt Bölüm) -->
+    <section class="discord-section">
+      <div class="discord-info-left">
+        <div class="discord-big-avatar">
+          <svg viewBox="0 0 127.14 96.36">
+            <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.91,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.91,96.12,53,91.08,65.69,84.69,65.69Z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.25rem;">Discord Sunucumuza Katıl!</h3>
+          <p style="color: #cbd5e1; font-size: 0.95rem;">Daha fazla eğlence, özel çekilişler ve Minecraft yardımlaşması için ailemize katıl.</p>
+        </div>
+      </div>
+      <div>
+        <a href="https://discord.gg/turkmc" target="_blank" class="btn btn-discord" style="font-size: 1rem; padding: 0.8rem 1.6rem;">
+          discord.gg/turkmc ➔
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================================
+       MODAL 1: Sunucu Detay Görünümü (Görsel 4 Uyarlaması)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="detailModal">
+    <div class="modal-card">
+      <button class="modal-close-icon" onclick="closeModal('detailModal')">✕</button>
+      
+      <!-- Sunucu Afiş / Banner Alanı (GIF veya Fotoğraf) -->
+      <div class="modal-banner-box">
+        <img id="modalBannerImg" src="" alt="Sunucu Bannerı">
+      </div>
+
+      <!-- Başlık ve Logo -->
+      <div class="modal-detail-head">
+        <img id="modalLogoImg" src="" alt="Logo" class="modal-detail-avatar">
+        <div style="flex: 1;">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.25rem;">
+            <h2 id="modalServerName" style="font-size: 1.6rem; font-weight: 800;">Sunucu Adı</h2>
+            <span id="modalCategoryBadge" class="server-category">Survival</span>
+          </div>
+          <p id="modalSlogan" style="color: var(--text-muted); font-size: 0.88rem;">Sunucu Açıklaması</p>
+        </div>
+      </div>
+
+      <!-- Özellikler Tablosu (Görsel 4'teki Minecraft Sunucu Bilgileri) -->
+      <div class="modal-detail-body">
+        <div class="specs-grid">
+          <div class="spec-card">
+            <div class="lbl">Minecraft Sunucu Adresi</div>
+            <div class="val" id="modalIpVal" style="color: #fbbf24; font-family: 'JetBrains Mono', monospace;">oyna.ornekcraft.com</div>
+          </div>
+          <div class="spec-card">
+            <div class="lbl">Sunucu Sürümü</div>
+            <div class="val" id="modalVersionVal">1.20.4 - 1.21.x</div>
+          </div>
+          <div class="spec-card">
+            <div class="lbl">Sunucu Slotu / Kapasite</div>
+            <div class="val" id="modalSlotVal">1000 Oyuncu</div>
+          </div>
+          <div class="spec-card">
+            <div class="lbl">Sunucu Türü</div>
+            <div class="val" id="modalTypeVal">Survival / Emek</div>
+          </div>
+          <div class="spec-card">
+            <div class="lbl">Zorluk Seviyesi</div>
+            <div class="val" id="modalDifficultyVal">Orta - Emek</div>
+          </div>
+          <div class="spec-card">
+            <div class="lbl">İletişim & Discord</div>
+            <div class="val" id="modalDiscordVal">
+              <a id="modalDiscordLink" href="#" target="_blank" style="color: #38bdf8; text-decoration: none;">Discord'a Git ➔</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- IP Kopyalama Butonu -->
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+          <button class="btn btn-gold" style="flex: 1;" onclick="copyModalIp()">
+            📋 Sunucu IP Adresini Kopyala (<span id="modalCopyIpText">oyna.ornekcraft.com</span>)
+          </button>
+          <a id="modalWebBtn" href="#" target="_blank" class="btn btn-ghost" style="display: none;">
+            🌐 Web Sitesi
+          </a>
+        </div>
+
+        <!-- Detaylı Tanıtım Metni & Özellikler -->
+        <h4 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff;">📖 Sunucu Tanıtımı & Özellikleri</h4>
+        <div class="detail-story-box" id="modalDescription">
+          Sunucu özellikleri burada yer alacaktır.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: Ücretsiz Sunucu Tanıtımı Ekleme Formu
+       ========================================================================= -->
+  <div class="modal-backdrop" id="addModal">
+    <div class="modal-card">
+      <button class="modal-close-icon" onclick="closeModal('addModal')">✕</button>
+      
+      <div style="padding: 2rem;">
+        <div style="margin-bottom: 1.5rem;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: #fbbf24; text-transform: uppercase;">%100 Ücretsiz</span>
+          <h2 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin-top: 0.2rem;">Minecraft Sunucunu Tanıt</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Sunucunu ekle, yönetim panelimizden onaylandıktan sonra listede yerini alsın!
+          </p>
+        </div>
+
+        <form id="addServerForm" onsubmit="handleServerSubmit(event)">
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Sunucu Adı *</label>
+              <input type="text" id="addName" class="form-control" placeholder="Örn: RebornCraft" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sunucu IP Adresi *</label>
+              <input type="text" id="addIp" class="form-control" placeholder="Örn: play.reborncraft.pw" required>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Sunucu Türü / Kategori *</label>
+              <select id="addCategory" class="form-control" required>
+                <option value="Survival">Survival</option>
+                <option value="Skyblock">Skyblock</option>
+                <option value="Towny">Towny</option>
+                <option value="Hub">Hub</option>
+                <option value="PvP">PvP</option>
+                <option value="Faction">Faction</option>
+                <option value="Creative">Creative</option>
+                <option value="RPG">RPG</option>
+                <option value="ConCon">ConCon</option>
+                <option value="BoxMining">BoxMining</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sunucu Sürümü *</label>
+              <input type="text" id="addVersion" class="form-control" placeholder="Örn: 1.20 - 1.21" required>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Slot / Kapasite</label>
+              <input type="text" id="addSlot" class="form-control" placeholder="Örn: 500 Oyuncu" value="500">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Zorluk Seviyesi</label>
+              <input type="text" id="addDifficulty" class="form-control" placeholder="Örn: Emek, Kolay, Zor" value="Emek">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Banner / Afiş Görsel URL (GIF veya Fotoğraf) *</label>
+            <input type="url" id="addBanner" class="form-control" placeholder="https://ornek.com/banner.gif veya banner.png" required>
+            <div class="form-desc-hint">Yatay görsel veya animasyonlu GIF linki giriniz (Hızlı yükleme için 468x60 veya 900x200 önerilir).</div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Sunucu Logo URL'si</label>
+              <input type="url" id="addLogo" class="form-control" placeholder="https://ornek.com/logo.png">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Discord Davet Linki</label>
+              <input type="url" id="addDiscord" class="form-control" placeholder="https://discord.gg/ornek">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Kısa Slogan / Özet *</label>
+            <input type="text" id="addSlogan" class="form-control" placeholder="Örn: Türkiye'nin En Gelişmiş Emek Survival Sunucusu!" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Detaylı Tanıtım Açıklaması & Özellikler *</label>
+            <textarea id="addDescription" class="form-control" rows="4" placeholder="Sunucunuzdaki sistemler, kurallar, rütbeler ve oyun modları hakkında bilgi verin..." required></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-ghost" onclick="closeModal('addModal')">İptal</button>
+            <button type="submit" class="btn btn-gold">🚀 Sunucu Başvurusunu Gönder</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Bildirimi -->
+  <div class="toast-box" id="toastNotice">
+    <span>✓</span> <span id="toastMsg">İşlem başarıyla tamamlandı!</span>
+  </div>
+
+  <!-- Alt Bilgi / Footer -->
+  <footer class="footer">
+    <div class="footer-brand">TÜRKMC</div>
+    <p>Sadece Bir Sunucu Değil, Bir Aile!</p>
+    <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #475569;">
+      Minecraft, Mojang AB'nin tescilli ticari markasıdır. Bu site Mojang veya Microsoft ile bağlantılı değildir.
+    </p>
+  </footer>
+
+  <!-- =========================================================================
+       JavaScript: Sunucu Verileri, Arama, Filtreleme ve Başvuru Mantığı
+       ========================================================================= -->
+  <script>
+    // Başlangıç Varsayılan Sunucu Verileri (Görsellerdeki Sunuculardan İlham Alınmıştır)
+    const DEFAULT_SERVERS = [
+      {
+        id: "srv-1",
+        name: "PurpurMC",
+        ip: "oyna.purpurmc.com",
+        category: "Survival",
+        version: "1.20 - 1.21",
+        slot: "2026 Oyuncu",
+        difficulty: "Emek",
+        slogan: "26.2 Son Sürüm SMP - Sesli Sohbet, Özel Claim ve Ekonomi Sistemi!",
+        banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80",
+        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=PurpurMC",
+        discord: "https://discord.gg/turkmc",
+        web: "https://purpurmc.com",
+        featured: true,
+        description: "PurpurMC, Türkiye'nin en gelişmiş ve yenilikçi SMP Survival sunucularından biridir.\n\nÖzellikler:\n• Gelişmiş Claim & Güvenlik Sistemi\n• Sesli Sohbet (Proximity Chat) desteği\n• Özel Meslekler ve Dengeli Ekonomi\n• BattlePass ve Günlük Ödüller\n• 7/24 Kesintisiz Aktif Destek Ekibi"
+      },
+      {
+        id: "srv-2",
+        name: "RebornCraft",
+        ip: "play.reborncraft.pw",
+        category: "Skyblock",
+        version: "1.16 - 1.20",
+        slot: "1000 Oyuncu",
+        difficulty: "Orta",
+        slogan: "Yenilikçi Skyblock Deneyimi, Ada Yükseltmeleri ve Minyonlar!",
+        banner: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=RebornCraft",
+        discord: "https://discord.gg/turkmc",
+        web: "",
+        featured: true,
+        description: "RebornCraft Skyblock dünyasında kendi adanı kur, minyonlarını çalıştır ve en güçlü ada sahibi ol!\n\nÖne Çıkanlar:\n• Özel Ada Görevleri ve Seviyeleri\n• Otomatik Minyon Sistemleri\n• Haftalık Ada Sıralaması ve Ödüller\n• Hilesiz, korumalı PvP Arenası"
+      },
+      {
+        id: "srv-3",
+        name: "SentorCraft",
+        ip: "play.sentorcraft.com",
+        category: "Towny",
+        version: "1.20.4",
+        slot: "800 Oyuncu",
+        difficulty: "Emek",
+        slogan: "Gerçek Dünya Haritası Üzerinde Kendi Krallığını ve Şehrini Kur!",
+        banner: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=SentorCraft",
+        discord: "https://discord.gg/turkmc",
+        web: "",
+        featured: false,
+        description: "SentorCraft Towny sunucusunda ulusunu kur, sınırlarını genişlet ve diplomasi geliştir!\n\nÖzellikler:\n• 1:500 Gerçek Dünya Haritası\n• Kuşatma ve Savaş Sistemleri\n• Ulusal Ticaret ve Bankacılık\n• Kültürel Gelişim Ağaçları"
+      },
+      {
+        id: "srv-4",
+        name: "MuzCraft",
+        ip: "mc.muzcraft.com",
+        category: "Faction",
+        version: "1.8 - 1.20",
+        slot: "1500 Oyuncu",
+        difficulty: "Zor",
+        slogan: "7 Yıldır Sıfırlanmayan Türkiye'nin Tek Köklü Faction Sunucusu!",
+        banner: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80",
+        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=MuzCraft",
+        discord: "https://discord.gg/turkmc",
+        web: "",
+        featured: false,
+        description: "MuzCraft Faction'da klanını topla, TNT toplarını hazırla ve düşman kalelerini fethet!\n\nÖne Çıkanlar:\n• Sıfırlanmayan Emek Klan Arenası\n• Özel Boss Zindanları\n• Koth ve Outpost Savaşları\n• Dengeli PvP ve Büyü Sistemi"
+      },
+      {
+        id: "srv-5",
+        name: "Coleras Network",
+        ip: "play.coleras.com",
+        category: "BoxMining",
+        version: "1.16.5 - 1.21",
+        slot: "500 Oyuncu",
+        difficulty: "Kolay",
+        slogan: "Yenilikçi BoxMining & Kutu Madenciliği Dünyası!",
+        banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80",
+        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=Coleras",
+        discord: "https://discord.gg/turkmc",
+        web: "",
+        featured: false,
+        description: "Kaz, geliştir, takas yap ve en güçlü madenci ekipmanlarına sahip ol!\n\nÖzellikler:\n• Hızlı Maden Yenilenmesi\n• Kutu Yükseltme ve Prestij Seviyeleri\n• Özel Zırh Setleri ve Tılsımlar"
+      },
+      {
+        id: "srv-6",
+        name: "Clastien Network",
+        ip: "play.clastiennetwork.com",
+        category: "Hub",
+        version: "1.8 - 1.21",
+        slot: "2000 Oyuncu",
+        difficulty: "Orta",
+        slogan: "BedWars, SkyWars, Survival ve Dahası Tek Bir Çatı Altında!",
+        banner: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=800&q=80",
+        logo: "https://api.dicebear.com/7.x/identicon/svg?seed=Clastien",
+        discord: "https://discord.gg/turkmc",
+        web: "",
+        featured: false,
+        description: "Türkiye'nin en hızlı bağlantısına sahip minigames ve hub ağı.\n\nİçerikler:\n• Özel Kozmetikler ve Kanatlar\n• BedWars 1v1, 2v2, 4v4 Arenaları\n• Düzenli Ödüllü Turnuvalar"
+      }
+    ];
+
+    // LocalStorage veya Worker API üzerinden sunucuları al
+    function getStoredServers() {
+      const saved = localStorage.getItem('turkmc_approved_servers');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch(e) {}
+      }
+      localStorage.setItem('turkmc_approved_servers', JSON.stringify(DEFAULT_SERVERS));
+      return DEFAULT_SERVERS;
+    }
+
+    let allServers = getStoredServers();
+    let currentCategory = 'all';
+    let currentSearchTerm = '';
+    let currentSelectedServer = null;
+
+    // Sunucuları Ekrana Yazdır
+    function renderServers() {
+      const grid = document.getElementById('serverGrid');
+      const countBadge = document.getElementById('serverCountBadge');
+
+      const filtered = allServers.filter(srv => {
+        const matchesCategory = (currentCategory === 'all' || srv.category.toLowerCase() === currentCategory.toLowerCase());
+        const term = currentSearchTerm.toLowerCase().trim();
+        const matchesSearch = !term || 
+          srv.name.toLowerCase().includes(term) || 
+          srv.ip.toLowerCase().includes(term) || 
+          srv.category.toLowerCase().includes(term) ||
+          srv.slogan.toLowerCase().includes(term);
+        return matchesCategory && matchesSearch;
+      });
+
+      countBadge.textContent = `${filtered.length} Sunucu`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; background: rgba(15, 23, 42, 0.5); border-radius: 16px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.4rem;">Aradığınız kriterlere uygun sunucu bulunamadı</h3>
+            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.2rem;">Farklı bir kategori seçebilir veya ilk sunucuyu sen tanıtabilirsin!</p>
+            <button class="btn btn-gold" onclick="openAddModal()">+ İlk Sen Sunucu Ekle</button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(srv => `
+        <div class="server-card ${srv.featured ? 'featured-card' : ''}" onclick="openDetailModal('${srv.id}')">
+          ${srv.featured ? '<span class="featured-tag">★ ÖNE ÇIKAN</span>' : ''}
+          
+          <div class="server-banner-container">
+            <img src="${srv.banner}" alt="${srv.name} Banner" class="server-banner-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'">
+            <div class="server-banner-overlay"></div>
+          </div>
+
+          <div class="server-content">
+            <div class="server-header-info">
+              <div class="server-identity">
+                <img src="${srv.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + srv.name}" alt="${srv.name} Logo" class="server-logo">
+                <div>
+                  <h3 class="server-title">${srv.name}</h3>
+                  <div style="font-size: 0.8rem; color: #94a3b8;">${srv.slogan || ''}</div>
+                </div>
+              </div>
+              <span class="server-category">${srv.category}</span>
+            </div>
+
+            <div class="server-tags">
+              <span class="tag-item"><span class="status-live"></span> Aktif</span>
+              <span class="tag-item">🎮 Sürüm: ${srv.version}</span>
+              <span class="tag-item">👥 Kapasite: ${srv.slot || '500'}</span>
+              <span class="tag-item">⚔️ ${srv.difficulty || 'Emek'}</span>
+            </div>
+
+            <div class="server-actions-bar" onclick="event.stopPropagation()">
+              <span class="server-ip-text">${srv.ip}</span>
+              <div style="display: flex; gap: 0.4rem;">
+                <button class="btn-copy-ip" onclick="copyIp('${srv.ip}')">
+                  📋 IP Kopyala
+                </button>
+                <button class="btn-copy-ip" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;" onclick="openDetailModal('${srv.id}')">
+                  İncele ➔
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Kategoriye Göre Filtreleme
+    function filterByCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      renderServers();
+    }
+
+    // Arama Çubuğu
+    function handleSearch() {
+      currentSearchTerm = document.getElementById('searchInput').value;
+      renderServers();
+    }
+
+    // IP Kopyalama ve Toast Gösterimi
+    function copyIp(ip) {
+      navigator.clipboard.writeText(ip).then(() => {
+        showToast(`"${ip}" panoya kopyalandı!`);
+      }).catch(() => {
+        showToast(`IP Adresi: ${ip}`);
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotice');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Sunucu Detay Modalı (Görsel 4)
+    function openDetailModal(id) {
+      const server = allServers.find(s => s.id === id);
+      if (!server) return;
+      currentSelectedServer = server;
+
+      document.getElementById('modalBannerImg').src = server.banner;
+      document.getElementById('modalLogoImg').src = server.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + server.name;
+      document.getElementById('modalServerName').textContent = server.name;
+      document.getElementById('modalSlogan').textContent = server.slogan || 'Minecraft Sunucu Tanıtımı';
+      document.getElementById('modalCategoryBadge').textContent = server.category;
+
+      document.getElementById('modalIpVal').textContent = server.ip;
+      document.getElementById('modalCopyIpText').textContent = server.ip;
+      document.getElementById('modalVersionVal').textContent = server.version;
+      document.getElementById('modalSlotVal').textContent = server.slot || 'Belirtilmedi';
+      document.getElementById('modalTypeVal').textContent = server.category;
+      document.getElementById('modalDifficultyVal').textContent = server.difficulty || 'Standart';
+
+      const discordLink = document.getElementById('modalDiscordLink');
+      if (server.discord) {
+        discordLink.href = server.discord;
+        discordLink.textContent = "Discord'a Git ➔";
+        discordLink.style.display = "inline";
+      } else {
+        discordLink.textContent = "Bulunmuyor";
+        discordLink.removeAttribute('href');
+      }
+
+      const webBtn = document.getElementById('modalWebBtn');
+      if (server.web) {
+        webBtn.href = server.web;
+        webBtn.style.display = "inline-flex";
+      } else {
+        webBtn.style.display = "none";
+      }
+
+      document.getElementById('modalDescription').textContent = server.description || 'Detaylı tanıtım metni bulunmuyor.';
+
+      document.getElementById('detailModal').classList.add('active');
+    }
+
+    function copyModalIp() {
+      if (currentSelectedServer) {
+        copyIp(currentSelectedServer.ip);
+      }
+    }
+
+    // Sunucu Ekleme Modalı
+    function openAddModal() {
+      document.getElementById('addModal').classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Kullanıcı Sunucu Başvurusu Gönderdiğinde
+    function handleServerSubmit(e) {
+      e.preventDefault();
+
+      const newApplication = {
+        id: "pending-" + Date.now(),
+        name: document.getElementById('addName').value.trim(),
+        ip: document.getElementById('addIp').value.trim(),
+        category: document.getElementById('addCategory').value,
+        version: document.getElementById('addVersion').value.trim(),
+        slot: document.getElementById('addSlot').value.trim() || '500',
+        difficulty: document.getElementById('addDifficulty').value.trim() || 'Emek',
+        banner: document.getElementById('addBanner').value.trim(),
+        logo: document.getElementById('addLogo').value.trim() || ('https://api.dicebear.com/7.x/identicon/svg?seed=' + document.getElementById('addName').value.trim()),
+        discord: document.getElementById('addDiscord').value.trim() || 'https://discord.gg/turkmc',
+        slogan: document.getElementById('addSlogan').value.trim(),
+        description: document.getElementById('addDescription').value.trim(),
+        appliedAt: new Date().toLocaleString('tr-TR'),
+        status: 'pending'
+      };
+
+      // Bekleyen başvurulara kaydet (Admin panelinde onaylanacak!)
+      let pendingList = [];
+      const savedPending = localStorage.getItem('turkmc_pending_servers');
+      if (savedPending) {
+        try { pendingList = JSON.parse(savedPending); } catch(err) {}
+      }
+      pendingList.push(newApplication);
+      localStorage.setItem('turkmc_pending_servers', JSON.stringify(pendingList));
+
+      // Formu sıfırla ve kapat
+      document.getElementById('addServerForm').reset();
+      closeModal('addModal');
+
+      showToast("🎉 Başvurunuz alındı! Yönetici onayından sonra yayınlanacaktır.");
+    }
+
+    // Modal dışına tıklandığında kapatma
+    window.onclick = function(e) {
+      if (e.target.classList.contains('modal-backdrop')) {
+        e.target.classList.remove('active');
+      }
+    };
+
+    // Sayfa Açıldığında Başlat
+    window.addEventListener('DOMContentLoaded', () => {
+      renderServers();
+    });
+  </script>
 </body>
 </html>
