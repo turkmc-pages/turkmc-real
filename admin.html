@@ -48,7 +48,7 @@
       pointer-events: none;
     }
 
-    /* Giriş Ekranı (Login Screen) */
+    /* Giriş Ekranı */
     .login-container {
       min-height: 100vh;
       display: flex;
@@ -80,7 +80,7 @@
       margin-bottom: 0.5rem;
     }
 
-    /* Dashboard Düzeni */
+    /* Dashboard */
     .dashboard-view {
       display: none;
     }
@@ -109,7 +109,6 @@
       padding: 2.5rem 1.5rem 5rem;
     }
 
-    /* İstatistik Kartları */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -129,7 +128,6 @@
       border-radius: 16px;
       padding: 1.5rem;
       position: relative;
-      overflow: hidden;
     }
 
     .stat-card .num {
@@ -146,7 +144,6 @@
       font-weight: 600;
     }
 
-    /* Sekmeler */
     .admin-tabs {
       display: flex;
       align-items: center;
@@ -191,7 +188,6 @@
       border-radius: 100px;
     }
 
-    /* Başvuru Kartları */
     .application-card {
       background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.09);
@@ -255,7 +251,6 @@
       padding-top: 1rem;
     }
 
-    /* Buton Stilleri */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -318,7 +313,6 @@
       border-color: var(--primary-gold);
     }
 
-    /* Toast */
     .toast-box {
       position: fixed;
       bottom: 2rem;
@@ -344,9 +338,7 @@
 
   <div class="bg-layer"></div>
 
-  <!-- =========================================================================
-       1. GİRİŞ EKRANI (ŞİFRE KORUMASI)
-       ========================================================================= -->
+  <!-- GİRİŞ EKRANI -->
   <div class="login-container" id="loginScreen">
     <div class="login-card">
       <div class="login-logo">
@@ -362,7 +354,7 @@
       </p>
 
       <form onsubmit="handleLogin(event)">
-        <input type="password" id="adminPasswordInput" class="form-input" placeholder="Yönetici Şifresi (Varsayılan: turkmc2026)" required autofocus>
+        <input type="password" id="adminPasswordInput" class="form-input" placeholder="Yönetici Şifrenizi Girin" required autofocus>
         <div id="loginErrorMsg" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 1rem; display: none;">
           ⚠️ Hatalı şifre girdiniz! Lütfen tekrar deneyin.
         </div>
@@ -377,9 +369,7 @@
     </div>
   </div>
 
-  <!-- =========================================================================
-       2. YÖNETİM DASHBOARD (GİRİŞ YAPILDIKTAN SONRA AÇILIR)
-       ========================================================================= -->
+  <!-- DASHBOARD -->
   <div class="dashboard-view" id="dashboardScreen">
     <header class="admin-navbar">
       <div class="admin-nav-inner">
@@ -404,7 +394,6 @@
     </header>
 
     <main class="admin-container">
-      <!-- İstatistik Sayaçları -->
       <div class="stats-grid">
         <div class="stat-card" style="border-left: 4px solid #ef4444;">
           <div class="num" id="statPendingCount">0</div>
@@ -420,7 +409,6 @@
         </div>
       </div>
 
-      <!-- Sekme Menüsü -->
       <div class="admin-tabs">
         <button class="tab-btn active" onclick="switchTab('pending')" id="tabBtnPending">
           ⏳ Bekleyen Başvurular <span class="tab-badge" id="tabBadgePending">0</span>
@@ -433,9 +421,7 @@
         </button>
       </div>
 
-      <!-- =====================================================================
-           SEKME 1: BEKLEYEN BAŞVURULAR (ONAY / RET)
-           ===================================================================== -->
+      <!-- SEKME 1: BEKLEYENLER -->
       <div id="sectionPending">
         <div style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
           <h3 style="font-size: 1.25rem; font-weight: 800;">Gelen Sunucu Başvuruları</h3>
@@ -444,27 +430,19 @@
           </span>
         </div>
 
-        <div id="pendingListContainer">
-          <!-- Başvurular JS ile yüklenecek -->
-        </div>
+        <div id="pendingListContainer"></div>
       </div>
 
-      <!-- =====================================================================
-           SEKME 2: YAYINDAKİ SUNUCULAR
-           ===================================================================== -->
+      <!-- SEKME 2: YAYINDAKİLER -->
       <div id="sectionLive" style="display: none;">
         <div style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
           <h3 style="font-size: 1.25rem; font-weight: 800;">Şu Anda Sitede Yayında Olan Sunucular</h3>
         </div>
 
-        <div id="liveListContainer">
-          <!-- Yayındaki sunucular JS ile yüklenecek -->
-        </div>
+        <div id="liveListContainer"></div>
       </div>
 
-      <!-- =====================================================================
-           SEKME 3: AYARLAR & YEDEKLEME
-           ===================================================================== -->
+      <!-- SEKME 3: AYARLAR -->
       <div id="sectionSettings" style="display: none;">
         <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 2rem; max-width: 650px;">
           <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem;">🔐 Yönetici Şifresini Değiştir</h3>
@@ -478,15 +456,15 @@
 
           <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">💾 Veri Yönetimi & Yedekleme</h3>
           <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
-            Sunucu listesini JSON formatında indirebilir veya varsayılan sunucu listesini geri yükleyebilirsiniz.
+            Sunucu listesini JSON formatında indirebilir veya sıfırlayabilirsiniz.
           </p>
 
           <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
             <button class="btn btn-ghost" onclick="exportDataJson()">
               📥 Verileri İndir (JSON Yedek)
             </button>
-            <button class="btn btn-danger" onclick="resetToDefaults()">
-              🔄 Varsayılan Sunucuları Yükle
+            <button class="btn btn-danger" onclick="clearAllServers()">
+              🗑️ Tüm Sunucuları Temizle (Sıfırla)
             </button>
           </div>
         </div>
@@ -494,18 +472,15 @@
     </main>
   </div>
 
-  <!-- Toast -->
   <div class="toast-box" id="toastNotice">
     <span>✓</span> <span id="toastMsg">İşlem başarıyla tamamlandı!</span>
   </div>
 
   <script>
-    // Şifre Yönetimi (Varsayılan: turkmc2026)
     function getAdminPassword() {
       return localStorage.getItem('turkmc_admin_password') || 'turkmc2026';
     }
 
-    // Giriş Kontrolü
     function handleLogin(e) {
       e.preventDefault();
       const enteredPass = document.getElementById('adminPasswordInput').value;
@@ -533,7 +508,6 @@
       document.getElementById('loginErrorMsg').style.display = 'none';
     }
 
-    // Sekme Değiştirme
     function switchTab(tab) {
       document.getElementById('sectionPending').style.display = tab === 'pending' ? 'block' : 'none';
       document.getElementById('sectionLive').style.display = tab === 'live' ? 'block' : 'none';
@@ -544,7 +518,6 @@
       document.getElementById('tabBtnSettings').classList.toggle('active', tab === 'settings');
     }
 
-    // Verileri Yükle & Listele
     function getPendingServers() {
       const data = localStorage.getItem('turkmc_pending_servers');
       return data ? JSON.parse(data) : [];
@@ -553,6 +526,28 @@
     function getLiveServers() {
       const data = localStorage.getItem('turkmc_approved_servers');
       return data ? JSON.parse(data) : [];
+    }
+
+    async function syncDashboardWithApi() {
+      try {
+        const [resPending, resApproved] = await Promise.all([
+          fetch('/api/admin/pending'),
+          fetch('/api/servers')
+        ]);
+        if (resPending.ok) {
+          const remotePending = await resPending.json();
+          if (Array.isArray(remotePending)) {
+            localStorage.setItem('turkmc_pending_servers', JSON.stringify(remotePending));
+          }
+        }
+        if (resApproved.ok) {
+          const remoteApproved = await resApproved.json();
+          if (Array.isArray(remoteApproved) && remoteApproved.length > 0) {
+            localStorage.setItem('turkmc_approved_servers', JSON.stringify(remoteApproved));
+          }
+        }
+        loadDashboardData();
+      } catch (err) {}
     }
 
     function loadDashboardData() {
@@ -568,7 +563,6 @@
       renderLiveList(live);
     }
 
-    // Bekleyen Başvuruları Ekrana Yazdır
     function renderPendingList(list) {
       const container = document.getElementById('pendingListContainer');
       if (list.length === 0) {
@@ -623,11 +617,16 @@
       `).join('');
     }
 
-    // Yayındaki Sunucuları Ekrana Yazdır
     function renderLiveList(list) {
       const container = document.getElementById('liveListContainer');
       if (list.length === 0) {
-        container.innerHTML = `<div style="text-align: center; padding: 2rem;">Yayında sunucu yok.</div>`;
+        container.innerHTML = `
+          <div style="text-align: center; padding: 3rem; background: rgba(15, 23, 42, 0.5); border-radius: 14px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+            <div style="font-size: 2rem; margin-bottom: 0.4rem;">✨</div>
+            <h4 style="font-size: 1.1rem; font-weight: 700;">Şu anda yayında hiçbir sunucu bulunmuyor.</h4>
+            <p style="color: #64748b; font-size: 0.85rem;">Yeni başvuruları onayladıkça burada listelenecektir.</p>
+          </div>
+        `;
         return;
       }
 
@@ -636,7 +635,7 @@
           <div class="app-content-body" style="padding: 1.2rem;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <img src="${item.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + item.name}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                <img src="${item.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + item.name}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" onerror="this.src='https://api.dicebear.com/7.x/identicon/svg?seed=mc'">
                 <div>
                   <h4 style="font-size: 1.1rem; font-weight: 800;">${item.name}</h4>
                   <span style="font-size: 0.82rem; color: #fbbf24; font-family: monospace;">${item.ip}</span>
@@ -656,39 +655,50 @@
       `).join('');
     }
 
-    // BAŞVURUYU ONAYLA (KABUL ET)
-    function approveApplication(id) {
+    async function approveApplication(id) {
       const pending = getPendingServers();
       const target = pending.find(p => p.id === id);
       if (!target) return;
 
-      // Bekleyenlerden çıkar
       const remainingPending = pending.filter(p => p.id !== id);
       localStorage.setItem('turkmc_pending_servers', JSON.stringify(remainingPending));
 
-      // Yayındakilere ekle
       const live = getLiveServers();
       target.id = "srv-" + Date.now();
       target.status = 'approved';
-      live.unshift(target); // En başa ekle
+      live.unshift(target);
       localStorage.setItem('turkmc_approved_servers', JSON.stringify(live));
+
+      try {
+        await fetch('/api/admin/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+      } catch (e) {}
 
       showToast(`✅ "${target.name}" sunucusu kabul edildi ve yayına alındı!`);
       loadDashboardData();
     }
 
-    // BAŞVURUYU REDDET
-    function rejectApplication(id) {
+    async function rejectApplication(id) {
       if (!confirm("Bu başvuruyu reddetmek ve silmek istediğinize emin misiniz?")) return;
       const pending = getPendingServers();
       const remaining = pending.filter(p => p.id !== id);
       localStorage.setItem('turkmc_pending_servers', JSON.stringify(remaining));
 
+      try {
+        await fetch('/api/admin/reject', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+      } catch (e) {}
+
       showToast("❌ Başvuru reddedildi ve silindi.");
       loadDashboardData();
     }
 
-    // Yayındaki Sunucuyu Sil
     function deleteLiveServer(id) {
       if (!confirm("Bu sunucuyu yayından kaldırmak istediğinize emin misiniz?")) return;
       const live = getLiveServers().filter(s => s.id !== id);
@@ -698,7 +708,6 @@
       loadDashboardData();
     }
 
-    // Öne Çıkar / Normal Yap
     function toggleFeatured(id) {
       const live = getLiveServers();
       const item = live.find(s => s.id === id);
@@ -710,7 +719,6 @@
       }
     }
 
-    // Şifre Değiştir
     function handleChangePassword(e) {
       e.preventDefault();
       const newPass = document.getElementById('newAdminPassword').value.trim();
@@ -723,7 +731,6 @@
       showToast("🔑 Yönetici şifreniz başarıyla güncellendi!");
     }
 
-    // Verileri JSON Olarak İndir
     function exportDataJson() {
       const data = {
         approved: getLiveServers(),
@@ -739,13 +746,12 @@
       URL.revokeObjectURL(url);
     }
 
-    // Varsayılanlara Dön
-    function resetToDefaults() {
-      if (!confirm("Tüm değişiklikler sıfırlanıp varsayılan sunucular yüklensin mi?")) return;
-      localStorage.removeItem('turkmc_approved_servers');
-      localStorage.removeItem('turkmc_pending_servers');
+    function clearAllServers() {
+      if (!confirm("Tüm sunucuları silmek ve listeyi tamamen temizlemek istediğinize emin misiniz?")) return;
+      localStorage.setItem('turkmc_approved_servers', JSON.stringify([]));
+      localStorage.setItem('turkmc_pending_servers', JSON.stringify([]));
       loadDashboardData();
-      showToast("Varsayılan sunucular başarıyla geri yüklendi.");
+      showToast("Tüm sunucular temizlendi, liste artık bomboş!");
     }
 
     function showToast(msg) {
@@ -755,11 +761,11 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Sayfa Açılışı
     window.addEventListener('DOMContentLoaded', () => {
       if (sessionStorage.getItem('turkmc_admin_logged_in') === 'true') {
         showDashboard();
       }
+      syncDashboardWithApi();
     });
   </script>
 </body>
