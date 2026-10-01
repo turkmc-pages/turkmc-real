@@ -192,7 +192,7 @@
     <!-- Arama Çubuğu -->
     <div class="search-box" id="searchBoxWrap">
       <span style="font-size: 1.1rem; color: #64748b;">🔍</span>
-      <input type="text" id="searchInput" class="search-input" placeholder="Sunucu adı, IP adresi veya mod ara..." oninput="handleSearch()">
+      <input type="text" id="searchInput" class="search-input" placeholder="Sunucu veya doku paketi ara..." oninput="handleSearch()">
       <div id="dynamicAddButtonContainer">
         <button class="btn btn-gold" onclick="openModal('addServerModal')">+ Sunucu Ekle (Ücretsiz)</button>
       </div>
@@ -232,6 +232,35 @@
       <a href="https://discord.gg/turkmc" target="_blank" class="btn btn-discord" style="padding: 0.75rem 1.5rem; font-size: 0.95rem; white-space: nowrap;">discord.gg/turkmc ➔</a>
     </section>
   </main>
+
+  <!-- MODAL: RESOURCEPACK EKLE -->
+  <div class="modal-backdrop" id="addPackModal">
+    <div class="modal-box">
+      <button class="modal-close-btn" onclick="closeModal('addPackModal')">✕</button>
+      <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.3rem;">🎨 ResourcePack / Doku Paketi Ekle</h3>
+      <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.25rem;">Kendi paketini veya sevdiğin bir doku paketini ekle! Yönetici onayından sonra yayınlanır.</p>
+      <form onsubmit="handleSubmitPack(event)">
+        <div class="form-grid-2">
+          <div class="form-group"><label class="form-label">Pack Adı *</label><input type="text" id="packName" class="form-control" placeholder="Örn: Faithful 32x PvP Edit" required></div>
+          <div class="form-group"><label class="form-label">Minecraft Sürümü *</label><input type="text" id="packVersion" class="form-control" placeholder="Örn: 1.8.9 veya 1.20" required></div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group"><label class="form-label">Çözünürlük *</label>
+            <select id="packRes" class="form-control" required>
+              <option value="16x">16x (FPS Boost / Hızlı)</option>
+              <option value="32x">32x (Dengeli / Klasik)</option>
+              <option value="64x">64x (Detaylı / Kristal)</option>
+              <option value="128x">128x (Ultra HD)</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">İndirme Linki (MediaFire/Drive/Discord) *</label><input type="url" id="packLink" class="form-control" placeholder="https://..." required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Önizleme / Arka Plan Fotoğraf URL *</label><input type="url" id="packImg" class="form-control" placeholder="https://... (Fotoğraf kartın arka planında gözükür)" required></div>
+        <div class="form-group"><label class="form-label">Pack Tanıtımı & Özellikleri *</label><textarea id="packDesc" class="form-control" rows="3" placeholder="Kısa kılıçlar, temiz cevherler vb..." required></textarea></div>
+        <button type="submit" class="btn btn-gold" style="width: 100%; padding: 0.75rem;">ResourcePack'i Başvuruya Gönder ➔</button>
+      </form>
+    </div>
+  </div>
 
   <!-- MODAL: DETAY GÖRÜNÜMÜ -->
   <div class="modal-backdrop" id="detailModal">
@@ -359,7 +388,7 @@
   <footer class="footer">
     <div style="font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 900; color: #fbbf24; margin-bottom: 0.4rem;">TÜRKMC</div>
     <p>Sadece Bir Sunucu Değil, Bir Aile!</p>
-    <p style="margin-top: 0.35rem; font-size: 0.8rem; color: #475569;">Minecraft Sunucuları, Klanlar, Tierlist ve Topluluk Platformu</p>
+    <p style="margin-top: 0.35rem; font-size: 0.8rem; color: #475569;">Minecraft Sunucuları, Klanlar, Tierlist, ResourcePack ve Topluluk Platformu</p>
   </footer>
 
   <script>
@@ -374,6 +403,17 @@
     let serversList = getStoredData('turkmc_approved_servers');
     let clansList = getStoredData('turkmc_approved_clans');
     let tierList = getStoredData('turkmc_approved_tierlist');
+    let packsList = getStoredData('turkmc_approved_packs');
+
+    if (packsList.length === 0) {
+      packsList = [
+        { id: "pack-1", name: "Breeze 16x Revamp", version: "1.8.9 PvP", res: "16x", downloads: 240, img: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=700&q=80", desc: "Kısa kılıçlar, temiz envanter ve düşük sistemler için yüksek FPS desteği.", link: "https://discord.gg/turkmc" },
+        { id: "pack-2", name: "Faithful 32x PvP Edit", version: "1.8 - 1.20", res: "32x", downloads: 512, img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=80", desc: "Klasik dokuları bozmadan net hatlar, düşük ateş ve canlı cevherler.", link: "https://discord.gg/turkmc" },
+        { id: "pack-3", name: "Spectral Crystal 1.9+", version: "1.9+ Sword & CPvP", res: "64x", downloads: 184, img: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=700&q=80", desc: "Kristal patlama efektleri, özel totem animasyonu ve net kalkan dokuları.", link: "https://discord.gg/turkmc" },
+        { id: "pack-4", name: "UHC Ultra FPS Boost", version: "1.8.9 UHC", res: "16x", downloads: 379, img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80", desc: "Düşük ekran kartları için maksimum akıcılık. Şeffaf arayüz ve vurgulu can barları.", link: "https://discord.gg/turkmc" }
+      ];
+      localStorage.setItem('turkmc_approved_packs', JSON.stringify(packsList));
+    }
 
     function switchMainView(view) {
       currentMainView = view;
@@ -416,8 +456,9 @@
         document.getElementById('sectionTitleText').textContent = "PvP & Tierlist Sunucuları";
       } else if (view === 'packs') {
         titleEl.innerHTML = "Minecraft <span>PvP ResourcePack</span> Galerisi";
-        subtitleEl.textContent = "1.8 ve 1.9 PvP, FPS Boost, UHC ve Bedwars için özenle seçilmiş doku paketleri! Önizle ve hemen indir.";
-        subCatWrap.style.display = 'none'; searchBoxWrap.style.display = 'none'; sectionHeadWrap.style.display = 'none';
+        subtitleEl.textContent = "1.8 ve 1.9 PvP, FPS Boost, UHC ve Bedwars için doku paketleri! Önizle, indir veya kendi paketini ekle.";
+        subCatWrap.style.display = 'none'; searchBoxWrap.style.display = 'flex'; sectionHeadWrap.style.display = 'none';
+        addBtnContainer.innerHTML = `<button class="btn btn-gold" onclick="openModal('addPackModal')">+ Pack Ekle (Ücretsiz)</button>`;
       } else if (view === 'giveaways') {
         titleEl.innerHTML = "TÜRKMC <span>Canlı Çekilişler & Etkinlikler</span>";
         subtitleEl.textContent = "Discord sunucumuzdaki aktif Nitro, VIP ve turnuva çekilişlerine katıl! Geri sayım bitmeden şansını dene.";
@@ -621,41 +662,23 @@
         `).join('') + `</div>`;
 
       } else if (currentMainView === 'packs') {
-        const samplePacks = [
-          {
-            name: "Breeze 16x Revamp", version: "1.8.9 PvP", res: "16x", downloads: "2.4K",
-            img: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=700&q=80",
-            desc: "Kısa kılıçlar, temiz envanter ve düşük sistemler için yüksek FPS desteği.", link: "https://discord.gg/turkmc"
-          },
-          {
-            name: "Faithful 32x PvP Edit", version: "1.8 - 1.20", res: "32x", downloads: "5.1K",
-            img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=80",
-            desc: "Klasik dokuları bozmadan net hatlar, düşük ateş ve canlı cevherler.", link: "https://discord.gg/turkmc"
-          },
-          {
-            name: "Spectral Crystal 1.9+", version: "1.9+ Sword & CPvP", res: "64x", downloads: "1.8K",
-            img: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=700&q=80",
-            desc: "Kristal patlama efektleri, özel totem animasyonu ve net kalkan dokuları.", link: "https://discord.gg/turkmc"
-          },
-          {
-            name: "UHC Ultra FPS Boost", version: "1.8.9 UHC", res: "16x", downloads: "3.7K",
-            img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80",
-            desc: "Düşük ekran kartları için maksimum akıcılık. Şeffaf arayüz ve vurgulu can barları.", link: "https://discord.gg/turkmc"
-          }
-        ];
+        const filteredPacks = packsList.filter(p => {
+          const term = currentSearchTerm.toLowerCase().trim();
+          return !term || p.name.toLowerCase().includes(term) || (p.version && p.version.toLowerCase().includes(term));
+        });
 
         showcase.innerHTML = `
           <div>
             <div style="text-align: center; max-width: 700px; margin: 0 auto 2rem;">
               <h2 style="font-size: 1.8rem; font-weight: 900; color: #fff;">🎨 En Popüler PvP Kaynak Paketleri</h2>
-              <p style="color: #94a3b8; font-size: 0.95rem;">TÜRKMC topluluğu tarafından onaylanmış ve en çok tercih edilen paketler.</p>
+              <p style="color: #94a3b8; font-size: 0.95rem;">TÜRKMC topluluğu tarafından onaylanmış ve gerçek indirme sayılarıyla listelenen paketler.</p>
             </div>
             <div class="pack-grid">
-              ${samplePacks.map(p => `
+              ${filteredPacks.map(p => `
                 <div class="pack-card">
                   <div class="pack-img-box">
-                    <img src="${p.img}" class="pack-img">
-                    <span class="pack-res-badge">${p.res}</span>
+                    <img src="${p.img || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=700&q=80'}" class="pack-img">
+                    <span class="pack-res-badge">${p.res || '32x'}</span>
                   </div>
                   <div class="pack-body">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
@@ -664,15 +687,15 @@
                     </div>
                     <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1rem; line-height: 1.5;">${p.desc}</p>
                     <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06);">
-                      <span style="font-size: 0.8rem; color: #64748b;">📥 ${p.downloads} İndirme</span>
-                      <a href="${p.link}" target="_blank" class="btn btn-gold" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;">📦 Discord'dan İndir ➔</a>
+                      <span style="font-size: 0.82rem; color: #fbbf24; font-weight: 700;" id="dl-count-${p.id}">📥 ${p.downloads || 0} İndirme</span>
+                      <button onclick="handleDownloadPack('${p.id}', '${p.link}')" class="btn btn-gold" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;">📦 Hemen İndir ➔</button>
                     </div>
                   </div>
                 </div>
               `).join('')}
             </div>
             <div style="text-align: center; margin-top: 2rem; background: rgba(15,23,42,0.6); border: 1px dashed rgba(255,255,255,0.1); border-radius: 14px; padding: 1.25rem;">
-              <p style="color: #cbd5e1; font-size: 0.95rem;">📢 <em>Kendi kaynak paketini burada yayınlatmak için Discord sunucumuza gelip ticket açabilirsin!</em></p>
+              <p style="color: #cbd5e1; font-size: 0.95rem;">📢 <em>Kendi yaptığın veya beğendiğin PvP doku paketini yukarıdaki "+ Pack Ekle" butonuyla hemen siteye ekleyebilirsin!</em></p>
             </div>
           </div>
         `;
@@ -961,6 +984,36 @@
       `;
       document.getElementById('detailDescription').textContent = tier.description;
       openModal('detailModal');
+    }
+
+    function handleSubmitPack(e) {
+      e.preventDefault();
+      const newPack = {
+        id: "pack-pending-" + Date.now(),
+        type: "pack",
+        name: document.getElementById('packName').value.trim(),
+        version: document.getElementById('packVersion').value.trim(),
+        res: document.getElementById('packRes').value,
+        link: document.getElementById('packLink').value.trim(),
+        img: document.getElementById('packImg').value.trim(),
+        desc: document.getElementById('packDesc').value.trim(),
+        downloads: 0,
+        appliedAt: new Date().toLocaleString('tr-TR')
+      };
+      savePending('turkmc_pending_packs', newPack);
+      closeModal('addPackModal');
+      showToast("🎉 ResourcePack başvurunuz alındı! Yönetici onayından sonra yayına alınacaktır.");
+    }
+
+    function handleDownloadPack(id, link) {
+      const pack = packsList.find(p => p.id === id);
+      if (pack) {
+        pack.downloads = (parseInt(pack.downloads) || 0) + 1;
+        localStorage.setItem('turkmc_approved_packs', JSON.stringify(packsList));
+        const dlEl = document.getElementById('dl-count-' + id);
+        if (dlEl) dlEl.textContent = '📥 ' + pack.downloads + ' İndirme';
+      }
+      window.open(link, '_blank');
     }
 
     function handleSubmitServer(e) {
