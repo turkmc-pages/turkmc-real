@@ -3,73 +3,8 @@
  * Minecraft Türkiye Topluluğu Sunucu Tanıtım ve Yönetim Sistemi
  */
 
-// Varsayılan Sunucu Verileri (İlk Kurulum İçin)
-const DEFAULT_SERVERS = [
-  {
-    id: "srv-1",
-    name: "PurpurMC",
-    ip: "oyna.purpurmc.com",
-    category: "Survival",
-    version: "26.2 / 1.20 - 1.21",
-    slot: "2026 Oyuncu",
-    difficulty: "Emek",
-    slogan: "26.2 Son Sürüm SMP - Sesli Sohbet, Özel Claim ve Ekonomi Sistemi!",
-    banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80",
-    logo: "https://api.dicebear.com/7.x/identicon/svg?seed=PurpurMC",
-    discord: "https://discord.gg/turkmc",
-    web: "https://purpurmc.com",
-    featured: true,
-    description: "PurpurMC, Türkiye'nin en yenilikçi SMP Survival sunucularından biridir.\n\nÖzellikler:\n• Gelişmiş Claim & Güvenlik Sistemi\n• Sesli Sohbet Desteği\n• Özel Meslekler ve Ticaret Pazarı\n• 7/24 Kesintisiz Destek Ekibi"
-  },
-  {
-    id: "srv-2",
-    name: "RebornCraft",
-    ip: "play.reborncraft.pw",
-    category: "Skyblock",
-    version: "1.16 - 1.20",
-    slot: "1000 Oyuncu",
-    difficulty: "Orta",
-    slogan: "Yenilikçi Skyblock Deneyimi, Ada Yükseltmeleri ve Minyonlar!",
-    banner: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
-    logo: "https://api.dicebear.com/7.x/identicon/svg?seed=RebornCraft",
-    discord: "https://discord.gg/turkmc",
-    web: "",
-    featured: true,
-    description: "RebornCraft ile kendi adanı kur, adanı genişlet ve en güçlü ada ol!\n\nÖne Çıkanlar:\n• Özel Ada Görevleri\n• Otomatik Minyon Sistemleri\n• Haftalık Ada Sıralaması"
-  },
-  {
-    id: "srv-3",
-    name: "SentorCraft",
-    ip: "play.sentorcraft.com",
-    category: "Towny",
-    version: "1.20.4",
-    slot: "800 Oyuncu",
-    difficulty: "Emek",
-    slogan: "Gerçek Dünya Haritasında Kendi Şehrini ve Krallığını Kur!",
-    banner: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
-    logo: "https://api.dicebear.com/7.x/identicon/svg?seed=SentorCraft",
-    discord: "https://discord.gg/turkmc",
-    web: "",
-    featured: false,
-    description: "SentorCraft Towny sunucusunda ulusunu kur, sınırlarını genişlet ve diplomasi geliştir!\n\nÖzellikler:\n• 1:500 Gerçek Dünya Haritası\n• Kuşatma ve Savaş Sistemleri"
-  },
-  {
-    id: "srv-4",
-    name: "MuzCraft",
-    ip: "mc.muzcraft.com",
-    category: "Faction",
-    version: "1.8 - 1.20",
-    slot: "1500 Oyuncu",
-    difficulty: "Zor",
-    slogan: "7 Yıldır Sıfırlanmayan Türkiye'nin Tek Köklü Faction Sunucusu!",
-    banner: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80",
-    logo: "https://api.dicebear.com/7.x/identicon/svg?seed=MuzCraft",
-    discord: "https://discord.gg/turkmc",
-    web: "",
-    featured: false,
-    description: "MuzCraft Faction'da klanını topla ve kaleleri fethet!\n\nÖne Çıkanlar:\n• Sıfırlanmayan Emek Klan Arenası\n• Boss Zindanları"
-  }
-];
+// Varsayılan Sunucu Verileri (Başlangıçta boş başlar, sadece onaylanan sunucular görünür)
+const DEFAULT_SERVERS = [];
 
 export default {
   async fetch(request, env, ctx) {
