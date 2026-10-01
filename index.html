@@ -113,10 +113,17 @@
     .store-price { font-size: 2.3rem; font-weight: 900; color: #fff; margin: 0.8rem 0 0.4rem; }
     .store-features-list { list-style: none; text-align: left; margin: 1.2rem 0; font-size: 0.85rem; color: #94a3b8; line-height: 1.75; }
     .store-features-list li::before { content: "✓ "; color: #10b981; font-weight: 800; }
+    .extra-section { margin-top: 2.5rem; background: rgba(15,23,42,0.85); border: 1px solid rgba(245,158,11,0.3); border-radius: 18px; padding: 1.8rem; text-align: center; }
+    .extra-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.2rem; }
+    .extra-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 1.2rem; text-align: center; transition: 0.25s; cursor: pointer; }
+    .extra-card:hover { border-color: #f59e0b; transform: translateY(-3px); }
+    .extra-badge { display: inline-block; background: #f59e0b; color: #0f172a; font-weight: 800; font-size: 0.85rem; padding: 0.25rem 0.8rem; border-radius: 100px; margin: 0.6rem 0; }
+    .btn-bump { background: linear-gradient(135deg, #ec4899, #8b5cf6); color: #fff; padding: 0.35rem 0.75rem; font-size: 0.78rem; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 0.3rem; }
+    .btn-bump:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(236,72,153,0.4); }
+    .bump-pill { font-size: 0.75rem; font-weight: 700; color: #fbbf24; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); padding: 0.15rem 0.5rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.3rem; }
   </style>
 </head>
 <body>
-
   <div class="bg-layer"></div>
   <div class="bg-glow-layer"></div>
 
@@ -422,6 +429,44 @@
       }
     }
 
+    function getBumpTimeInfo(lastBump) {
+      if (!lastBump) return { canBump: true, label: "🚀 /bump (Öne Çıkar)" };
+      const cooldown = 2 * 60 * 60 * 1000;
+      const diff = cooldown - (Date.now() - lastBump);
+      if (diff <= 0) return { canBump: true, label: "🚀 /bump (Öne Çıkar)" };
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const mins = Math.ceil((diff % (1000 * 60 * 60)) / (1000 * 60));
+      return { canBump: false, label: `⏳ ${hours > 0 ? hours + 's ' : ''}${mins}dk` };
+    }
+
+    function bumpItem(type, id, event) {
+      if (event) event.stopPropagation();
+      let key = '', list = [];
+      if (type === 'server') { key = 'turkmc_approved_servers'; list = serversList; }
+      else if (type === 'clan') { key = 'turkmc_approved_clans'; list = clansList; }
+      else if (type === 'tierlist') { key = 'turkmc_approved_tierlist'; list = tierList; }
+
+      const item = list.find(x => x.id === id);
+      if (!item) return;
+
+      const now = Date.now();
+      const cooldown = 2 * 60 * 60 * 1000;
+      const lastBump = item.lastBump || 0;
+
+      if (now - lastBump < cooldown) {
+        const diff = cooldown - (now - lastBump);
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const mins = Math.ceil((diff % (1000 * 60 * 60)) / (1000 * 60));
+        showToast(`⏳ Bekleme süresi var! ${hours > 0 ? hours + ' saat ' : ''}${mins} dakika sonra tekrar /bump yapabilirsiniz.`);
+        return;
+      }
+
+      item.lastBump = now;
+      localStorage.setItem(key, JSON.stringify(list));
+      showToast(`🚀 "${item.name}" başarıyla öne çıkarıldı ve en üste taşındı!`);
+      renderCurrentView();
+    }
+
     function renderCurrentView() {
       const showcase = document.getElementById('showcaseArea');
       const badge = document.getElementById('itemCountBadge');
@@ -432,6 +477,7 @@
           const term = currentSearchTerm.toLowerCase().trim();
           return catMatch && (!term || s.name.toLowerCase().includes(term) || s.ip.toLowerCase().includes(term));
         });
+        filtered.sort((a, b) => (b.lastBump || 0) - (a.lastBump || 0));
         badge.textContent = `${filtered.length} Sunucu`;
         if (filtered.length === 0) {
           showcase.innerHTML = getEmptyState("🎮", "Henüz Yayında Minecraft Sunucusu Bulunmuyor", "Topluluğumuza ilk katılan sunucu olmak için hemen ekle!", "addServerModal", "+ İlk Sen Sunucu Ekle");
@@ -456,13 +502,14 @@
                 <div class="card-tags">
                   <span class="tag-pill" id="pingStatus-${s.id}"><span class="status-live-dot"></span> Kontrol...</span>
                   <span class="tag-pill" id="pingPlayers-${s.id}">👥 Kapasite: ${s.slot || '500'}</span>
-                  <span class="tag-pill">🎮 ${s.version}</span>
+                  <span class="tag-pill">🎮 ${s.version}</span>${(Date.now() - (s.lastBump || 0) < 2 * 60 * 60 * 1000) ? '<span class="bump-pill">🔥 Öne Çıktı</span>' : ''}
                 </div>
                 <div class="card-bottom-bar" onclick="event.stopPropagation()">
                   <span class="card-ip-code">${s.ip}</span>
-                  <div style="display: flex; gap: 0.4rem;">
-                    <button class="btn btn-gold" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;" onclick="copyIp('${s.ip}')">📋 Kopyala</button>
-                    <button class="btn btn-ghost" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;" onclick="openServerDetail('${s.id}')">İncele ➔</button>
+                  <div style="display: flex; gap: 0.35rem;">
+                    <button class="btn btn-gold" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;" onclick="copyIp('${s.ip}')">📋 IP</button>
+                    <button class="btn-bump" onclick="bumpItem('server', '${s.id}', event)">${getBumpTimeInfo(s.lastBump).label}</button>
+                    <button class="btn btn-ghost" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;" onclick="openServerDetail('${s.id}')">İncele ➔</button>
                   </div>
                 </div>
               </div>
@@ -475,6 +522,7 @@
           const term = currentSearchTerm.toLowerCase().trim();
           return !term || c.name.toLowerCase().includes(term) || c.tag.toLowerCase().includes(term);
         });
+        filtered.sort((a, b) => (b.lastBump || 0) - (a.lastBump || 0));
         badge.textContent = `${filtered.length} Klan`;
         if (filtered.length === 0) {
           showcase.innerHTML = getEmptyState("⚔️", "Henüz Yayında Klan Bulunmuyor", "Klanını ilk sen ekle, yeni savaşçılar kazan ve öne çık!", "addClanModal", "+ İlk Sen Klan Ekle");
@@ -495,10 +543,10 @@
                 <span class="card-category-badge" style="background: rgba(168,85,247,0.15); color: #c084fc;">${c.gamemode || 'PvP'}</span>
               </div>
               <div class="card-tags">
-                <span class="tag-pill">👑 Lider: ${c.leader}</span><span class="tag-pill">👥 Üye: ${c.members}</span>
+                <span class="tag-pill">👑 Lider: ${c.leader}</span><span class="tag-pill">👥 Üye: ${c.members}</span>${(Date.now() - (c.lastBump || 0) < 2 * 60 * 60 * 1000) ? '<span class="bump-pill">🔥 Öne Çıktı</span>' : ''}
               </div>
               <div class="card-bottom-bar" onclick="event.stopPropagation()">
-                <span style="font-size: 0.85rem; color: #cbd5e1;">Klan Discord</span>
+                <button class="btn-bump" onclick="bumpItem('clan', '${c.id}', event)">${getBumpTimeInfo(c.lastBump).label}</button>
                 <a href="${c.discord}" target="_blank" class="btn btn-purple" style="padding: 0.35rem 0.85rem; font-size: 0.78rem;">Katıl ➔</a>
               </div>
             </div>
@@ -510,6 +558,7 @@
           const term = currentSearchTerm.toLowerCase().trim();
           return !term || t.name.toLowerCase().includes(term);
         });
+        filtered.sort((a, b) => (b.lastBump || 0) - (a.lastBump || 0));
         badge.textContent = `${filtered.length} Tierlist`;
         if (filtered.length === 0) {
           showcase.innerHTML = getEmptyState("🏆", "Henüz Yayında Tierlist Sunucusu Bulunmuyor", "PvP Tierlist sunucunu ilk sen ekle ve listele!", "addTierModal", "+ İlk Sen Tierlist Ekle");
@@ -530,10 +579,10 @@
                 <span class="card-category-badge" style="background: rgba(244,63,94,0.15); color: #fb7185;">${t.category}</span>
               </div>
               <div class="card-tags">
-                <span class="tag-pill">👑 Yetkili: ${t.owner}</span><span class="tag-pill">⚔️ Tür: ${t.category}</span>
+                <span class="tag-pill">👑 Yetkili: ${t.owner}</span><span class="tag-pill">⚔️ Tür: ${t.category}</span>${(Date.now() - (t.lastBump || 0) < 2 * 60 * 60 * 1000) ? '<span class="bump-pill">🔥 Öne Çıktı</span>' : ''}
               </div>
               <div class="card-bottom-bar" onclick="event.stopPropagation()">
-                <span style="font-size: 0.85rem; color: #cbd5e1;">Tier Discord</span>
+                <button class="btn-bump" onclick="bumpItem('tierlist', '${t.id}', event)">${getBumpTimeInfo(t.lastBump).label}</button>
                 <a href="${t.discord}" target="_blank" class="btn btn-rose" style="padding: 0.35rem 0.85rem; font-size: 0.78rem;">Sıralamaya Katıl ➔</a>
               </div>
             </div>
@@ -573,58 +622,117 @@
       } else if (currentMainView === 'store') {
         showcase.innerHTML = `
           <div>
-            <div style="text-align: center; max-width: 700px; margin: 0 auto 2.5rem;">
-              <h2 style="font-size: 1.8rem; font-weight: 900; color: #fff; margin-bottom: 0.5rem;">📢 Discord Sunucu Reklam Paketleri</h2>
-              <p style="color: #94a3b8; font-size: 0.95rem;">Sunucunuzu TÜRKMC'nin binlerce aktif Minecraft oyuncusuna tanıtın! Satın almak için pakete tıklayarak Discord'umuza katılabilirsiniz.</p>
+            <div style="text-align: center; max-width: 750px; margin: 0 auto 2.5rem;">
+              <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.9rem; border-radius: 100px; background: rgba(245,158,11,0.15); border: 1px solid #f59e0b; color: #fbbf24; font-size: 0.8rem; font-weight: 800; margin-bottom: 0.75rem;">
+                👑 DAHA FAZLA KİŞİ, DAHA BÜYÜK TOPLULUK!
+              </div>
+              <h2 style="font-size: 2.2rem; font-weight: 900; color: #fff; margin-bottom: 0.4rem; letter-spacing: -0.5px;">📢 REKLAM PAKETLERİ</h2>
+              <p style="color: #94a3b8; font-size: 0.95rem;">Sunucunuzun görünürlüğünü artırın, daha fazla kişiye ulaşın! Satın almak için istediğiniz pakete tıklayarak Discord'umuza katılabilirsiniz.</p>
             </div>
+
             <div class="store-grid">
               <div class="store-card copper" onclick="window.open('https://discord.gg/turkmc', '_blank')">
-                <div class="store-badge" style="background: rgba(217,119,6,0.2); color: #d97706; border: 1px solid #d97706;">BAKIR PAKET</div>
+                <div class="store-badge" style="background: rgba(217,119,6,0.25); color: #f59e0b; border: 1px solid #d97706;">BAKIR PAKET</div>
                 <div style="font-size: 2.5rem; margin-top: 0.8rem;">🥉</div>
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: #d97706; margin-top: 0.4rem;">Bakır Paket</h3>
-                <div class="store-price">200 <span style="font-size: 1rem; color: #94a3b8;">TL</span></div>
-                <p style="font-size: 0.82rem; color: #64748b;">Hızlı ve bütçe dostu tanıtım</p>
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: #f59e0b; margin-top: 0.4rem;">Bakır Paket</h3>
+                <div class="store-price">200 <span style="font-size: 1.2rem; color: #94a3b8;">₺</span></div>
                 <ul class="store-features-list">
-                  <li>Discord Tanıtım Kanalında Paylaşım</li><li>Sunucu Afişi ve Davet Linki</li><li>Kalıcı Paylaşım</li><li>1x Duyuru Bildirimi</li>
+                  <li>📅 5 Günlük Oda</li>
+                  <li>🎁 4 Günlük Çekiliş</li>
+                  <li>📢 1x &#64;Everyone</li>
+                  <li>♾️ Sınırsız Bakır Paket Rolü</li>
                 </ul>
-                <button class="btn btn-gold" style="margin-top: auto; width: 100%; background: #d97706; color: #fff;">Discord'dan Sipariş Ver ➔</button>
+                <button class="btn btn-gold" style="margin-top: auto; width: 100%; background: #d97706; color: #fff;">Discord'dan Satın Al ➔</button>
               </div>
+
               <div class="store-card iron" onclick="window.open('https://discord.gg/turkmc', '_blank')">
-                <div class="store-badge" style="background: rgba(148,163,184,0.2); color: #cbd5e1; border: 1px solid #cbd5e1;">DEMİR PAKET</div>
+                <div class="store-badge" style="background: rgba(148,163,184,0.25); color: #e2e8f0; border: 1px solid #94a3b8;">DEMİR PAKET</div>
                 <div style="font-size: 2.5rem; margin-top: 0.8rem;">🥈</div>
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: #cbd5e1; margin-top: 0.4rem;">Demir Paket</h3>
-                <div class="store-price">250 <span style="font-size: 1rem; color: #94a3b8;">TL</span></div>
-                <p style="font-size: 0.82rem; color: #64748b;">Etkili sunucu görünürlüğü</p>
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: #e2e8f0; margin-top: 0.4rem;">Demir Paket</h3>
+                <div class="store-price">250 <span style="font-size: 1.2rem; color: #94a3b8;">₺</span></div>
                 <ul class="store-features-list">
-                  <li>Öne Çıkan Reklam Kanalı</li><li>Görsel & Özel Metin Paylaşımı</li><li>@here Etiketli Bildirim</li><li>Sitede Ön Sıralara Geçiş</li>
+                  <li>📅 6 Günlük Oda</li>
+                  <li>🎁 5 Günlük Çekiliş</li>
+                  <li>📢 1x &#64;Everyone</li>
+                  <li>⭐ 2 Günlük Great</li>
+                  <li>♾️ Sınırsız Demir Paket Rolü</li>
                 </ul>
-                <button class="btn btn-ghost" style="margin-top: auto; width: 100%; color: #fff; border-color: #cbd5e1;">Discord'dan Sipariş Ver ➔</button>
+                <button class="btn btn-ghost" style="margin-top: auto; width: 100%; color: #fff; border-color: #cbd5e1;">Discord'dan Satın Al ➔</button>
               </div>
+
               <div class="store-card gold" onclick="window.open('https://discord.gg/turkmc', '_blank')">
-                <div class="store-badge" style="background: rgba(245,158,11,0.25); color: #fbbf24; border: 1px solid #f59e0b;">ÇOK SATAN 🔥</div>
+                <div class="store-badge" style="background: rgba(245,158,11,0.3); color: #fde047; border: 1px solid #f59e0b;">ALTIN PAKET 🔥</div>
                 <div style="font-size: 2.5rem; margin-top: 0.8rem;">🥇</div>
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: #fbbf24; margin-top: 0.4rem;">Altın Paket</h3>
-                <div class="store-price" style="color: #fbbf24;">400 <span style="font-size: 1rem; color: #94a3b8;">TL</span></div>
-                <p style="font-size: 0.82rem; color: #fbbf24;">Maksimum Oyuncu Çekme</p>
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: #fbbf24; margin-top: 0.4rem;">Altın Paket</h3>
+                <div class="store-price" style="color: #fbbf24;">400 <span style="font-size: 1.2rem; color: #94a3b8;">₺</span></div>
                 <ul class="store-features-list">
-                  <li>@everyone Bildirimli Özel Duyuru</li><li>Web Sitemizde Yıldızlı (VIP) Görünüm</li><li>Discord Sabitlenmiş Mesaj (3 Gün)</li><li>Özel Reklam Odası Tahsisi</li>
+                  <li>📅 10 Günlük Oda</li>
+                  <li>🎁 9 Günlük Çekiliş</li>
+                  <li>📢 1x &#64;Everyone</li>
+                  <li>📢 1x &#64;here</li>
+                  <li>⭐ 3 Günlük Great</li>
+                  <li>♾️ Sınırsız Altın Paket Rolü</li>
                 </ul>
-                <button class="btn btn-gold" style="margin-top: auto; width: 100%;">Discord'dan Sipariş Ver ➔</button>
+                <button class="btn btn-gold" style="margin-top: auto; width: 100%;">Discord'dan Satın Al ➔</button>
               </div>
+
               <div class="store-card diamond" onclick="window.open('https://discord.gg/turkmc', '_blank')">
-                <div class="store-badge" style="background: rgba(6,182,212,0.25); color: #22d3ee; border: 1px solid #06b6d4;">SPONSOR 💎</div>
+                <div class="store-badge" style="background: rgba(6,182,212,0.3); color: #67e8f9; border: 1px solid #06b6d4;">ELMAS PAKET 💎</div>
                 <div style="font-size: 2.5rem; margin-top: 0.8rem;">💎</div>
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: #22d3ee; margin-top: 0.4rem;">Elmas Paket</h3>
-                <div class="store-price" style="color: #22d3ee;">600 <span style="font-size: 1rem; color: #94a3b8;">TL</span></div>
-                <p style="font-size: 0.82rem; color: #22d3ee;">Tam Kapsamlı Sponsorluk</p>
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: #22d3ee; margin-top: 0.4rem;">Elmas Paket</h3>
+                <div class="store-price" style="color: #22d3ee;">600 <span style="font-size: 1.2rem; color: #94a3b8;">₺</span></div>
                 <ul class="store-features-list">
-                  <li>2x @everyone + @here Bildirimi</li><li>Web Sitesi En Üst VIP Sıralama (1 Hafta)</li><li>Discord Sponsor Rolü ve Özel Kategori</li><li>Özel Çekiliş / Turnuva Sponsorluğu</li>
+                  <li>📅 12 Günlük Oda</li>
+                  <li>🎁 10 Günlük Çekiliş</li>
+                  <li>📢 2x &#64;Everyone</li>
+                  <li>😊 Özel Kanal Emojisi</li>
+                  <li>⭐ 4 Günlük Great</li>
+                  <li>♾️ Sınırsız Elmas Paket Rolü</li>
                 </ul>
-                <button class="btn btn-gold" style="margin-top: auto; width: 100%; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff;">Discord'dan Sipariş Ver ➔</button>
+                <button class="btn btn-gold" style="margin-top: auto; width: 100%; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff;">Discord'dan Satın Al ➔</button>
               </div>
             </div>
-            <div style="text-align: center; margin-top: 2rem; background: rgba(15,23,42,0.6); border: 1px dashed rgba(255,255,255,0.1); border-radius: 14px; padding: 1.25rem;">
-              <p style="color: #cbd5e1; font-size: 0.95rem;">💡 <em>Paket satın almak veya özel reklam teklifi almak için paketlere tıklayarak Discord'a gelin ve ticket açın!</em></p>
+
+            <div class="extra-section">
+              <h3 style="font-size: 1.4rem; font-weight: 800; color: #fbbf24; margin-bottom: 0.2rem;">👑 EKSTRA ÖZELLİKLER</h3>
+              <p style="color: #94a3b8; font-size: 0.88rem;">Sunucunuzu veya profilinizi daha da öne çıkaracak ek avantajlar</p>
+              
+              <div class="extra-grid">
+                <div class="extra-card" onclick="window.open('https://discord.gg/turkmc', '_blank')">
+                  <div style="font-size: 2rem;">⭐</div>
+                  <h4 style="color: #fff; font-size: 1.05rem; font-weight: 700;">Great</h4>
+                  <div class="extra-badge">50 ₺ / Gün</div>
+                  <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.5;">Sunucunuza katılan kişi otomatik olarak etiketlenir.</p>
+                </div>
+
+                <div class="extra-card" onclick="window.open('https://discord.gg/turkmc', '_blank')">
+                  <div style="font-size: 2rem;">👑</div>
+                  <h4 style="color: #fff; font-size: 1.05rem; font-weight: 700;">1 Günlük En Üstte Bireysel Rol</h4>
+                  <div class="extra-badge">50 ₺</div>
+                  <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.5;">Bireysel rolünüz 1 gün boyunca rol listesinin en üstünde bulunur.</p>
+                </div>
+
+                <div class="extra-card" onclick="window.open('https://discord.gg/turkmc', '_blank')">
+                  <div style="font-size: 2rem;">👑</div>
+                  <h4 style="color: #fff; font-size: 1.05rem; font-weight: 700;">1 Aylık En Üstte Bireysel Rol</h4>
+                  <div class="extra-badge">200 ₺</div>
+                  <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.5;">Bireysel rolünüz 1 ay boyunca rol listesinin en üstünde bulunur.</p>
+                </div>
+
+                <div class="extra-card" onclick="window.open('https://discord.gg/turkmc', '_blank')">
+                  <div style="font-size: 2rem;">🛏️</div>
+                  <h4 style="color: #fff; font-size: 1.05rem; font-weight: 700;">1 Günlük Oda Uzatma</h4>
+                  <div class="extra-badge">60 ₺</div>
+                  <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.5;">Mevcut reklam odanızı 1 gün uzatabilirsiniz.</p>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: center; align-items: center; gap: 1.5rem; flex-wrap: wrap; margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem; color: #cbd5e1;">
+                <span>🛡️ <strong>Güvenilir Altyapı</strong></span>
+                <span>👥 <strong>Aktif Topluluk</strong></span>
+                <span>🎧 <strong>Hızlı Destek</strong></span>
+                <span style="color: #fbbf24;">👑 <strong>Sen de Aramıza Katıl!</strong></span>
+              </div>
             </div>
           </div>
         `;
@@ -658,6 +766,7 @@
         <div class="spec-card"><div class="lbl">Sürüm</div><div class="val">${srv.version}</div></div>
       `;
       document.getElementById('detailActionBtns').innerHTML = `
+        <button class="btn-bump" style="padding: 0.6rem 1rem; font-size: 0.88rem;" onclick="bumpItem('server', '${srv.id}')">${getBumpTimeInfo(srv.lastBump).label}</button>
         <button class="btn btn-gold" style="flex: 1;" onclick="copyIp('${srv.ip}')">📋 IP Adresini Kopyala (${srv.ip})</button>
         ${srv.discord ? `<a href="${srv.discord}" target="_blank" class="btn btn-discord">Discord'a Git ➔</a>` : ''}
       `;
@@ -678,7 +787,10 @@
         <div class="spec-card"><div class="lbl">Üye Sayısı</div><div class="val">${clan.members}</div></div>
         <div class="spec-card"><div class="lbl">Oyun Modu</div><div class="val">${clan.gamemode}</div></div>
       `;
-      document.getElementById('detailActionBtns').innerHTML = `<a href="${clan.discord}" target="_blank" class="btn btn-purple" style="flex: 1;">⚔️ Klana Katıl / Discord ➔</a>`;
+      document.getElementById('detailActionBtns').innerHTML = `
+        <button class="btn-bump" style="padding: 0.6rem 1rem; font-size: 0.88rem;" onclick="bumpItem('clan', '${clan.id}')">${getBumpTimeInfo(clan.lastBump).label}</button>
+        <a href="${clan.discord}" target="_blank" class="btn btn-purple" style="flex: 1;">⚔️ Klana Katıl / Discord ➔</a>
+      `;
       document.getElementById('detailDescription').textContent = clan.description;
       openModal('detailModal');
     }
@@ -696,7 +808,10 @@
         <div class="spec-card"><div class="lbl">Yetkili / Testçi</div><div class="val">${tier.owner}</div></div>
         <div class="spec-card"><div class="lbl">Derecelendirme</div><div class="val">Resmi Sıralama</div></div>
       `;
-      document.getElementById('detailActionBtns').innerHTML = `<a href="${tier.discord}" target="_blank" class="btn btn-rose" style="flex: 1;">🏆 Tier Testine Gir / Discord ➔</a>`;
+      document.getElementById('detailActionBtns').innerHTML = `
+        <button class="btn-bump" style="padding: 0.6rem 1rem; font-size: 0.88rem;" onclick="bumpItem('tierlist', '${tier.id}')">${getBumpTimeInfo(tier.lastBump).label}</button>
+        <a href="${tier.discord}" target="_blank" class="btn btn-rose" style="flex: 1;">🏆 Tier Testine Gir / Discord ➔</a>
+      `;
       document.getElementById('detailDescription').textContent = tier.description;
       openModal('detailModal');
     }
