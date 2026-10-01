@@ -1,10 +1,12 @@
 /**
  * TÜRKMC - Cloudflare Workers Dağıtım Dosyası (worker.js)
- * Minecraft Türkiye Topluluğu Sunucu Tanıtım ve Yönetim Sistemi
+ * Minecraft Türkiye Topluluğu: Sunucu, Klan ve Tierlist Tanıtım Sistemi
  */
 
-// Varsayılan Sunucu Verileri (Başlangıçta boş başlar, sadece onaylanan sunucular görünür)
+// Varsayılan Sunucular (Boş başlar, sadece eklenen ve onaylananlar listelenir)
 const DEFAULT_SERVERS = [];
+const DEFAULT_CLANS = [];
+const DEFAULT_TIERLIST = [];
 
 export default {
   async fetch(request, env, ctx) {
@@ -21,7 +23,7 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // --- API: Yayındaki Sunucuları Getir ---
+    // --- API: Yayındaki Minecraft Sunucularını Getir ---
     if (path === "/api/servers" && request.method === "GET") {
       let servers = DEFAULT_SERVERS;
       if (env && env.TURKMC_KV) {
@@ -33,84 +35,28 @@ export default {
       });
     }
 
-    // --- API: Yeni Sunucu Başvurusu Yap ---
-    if (path === "/api/servers/apply" && request.method === "POST") {
-      try {
-        const data = await request.json();
-        data.id = "pending-" + Date.now();
-        data.appliedAt = new Date().toLocaleString("tr-TR");
-        data.status = "pending";
-
-        if (env && env.TURKMC_KV) {
-          let pending = (await env.TURKMC_KV.get("pending_servers", { type: "json" })) || [];
-          pending.push(data);
-          await env.TURKMC_KV.put("pending_servers", JSON.stringify(pending));
-        }
-
-        return new Response(JSON.stringify({ success: true, item: data }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
-      } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), { status: 400, headers: corsHeaders });
-      }
-    }
-
-    // --- API: Admin Bekleyen Başvuruları Getir ---
-    if (path === "/api/admin/pending" && request.method === "GET") {
-      let pending = [];
+    // --- API: Yayındaki Klanları Getir ---
+    if (path === "/api/clans" && request.method === "GET") {
+      let clans = DEFAULT_CLANS;
       if (env && env.TURKMC_KV) {
-        pending = (await env.TURKMC_KV.get("pending_servers", { type: "json" })) || [];
+        const stored = await env.TURKMC_KV.get("approved_clans", { type: "json" });
+        if (stored && Array.isArray(stored)) clans = stored;
       }
-      return new Response(JSON.stringify(pending), {
+      return new Response(JSON.stringify(clans), {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
     }
 
-    // --- API: Admin Başvuruyu Onayla / Kabul Et ---
-    if (path === "/api/admin/approve" && request.method === "POST") {
-      try {
-        const { id } = await request.json();
-        if (env && env.TURKMC_KV) {
-          let pending = (await env.TURKMC_KV.get("pending_servers", { type: "json" })) || [];
-          let approved = (await env.TURKMC_KV.get("approved_servers", { type: "json" })) || DEFAULT_SERVERS;
-
-          const target = pending.find(p => p.id === id);
-          if (target) {
-            pending = pending.filter(p => p.id !== id);
-            target.id = "srv-" + Date.now();
-            target.status = "approved";
-            approved.unshift(target);
-
-            await env.TURKMC_KV.put("pending_servers", JSON.stringify(pending));
-            await env.TURKMC_KV.put("approved_servers", JSON.stringify(approved));
-            return new Response(JSON.stringify({ success: true, server: target }), {
-              headers: { ...corsHeaders, "Content-Type": "application/json" }
-            });
-          }
-        }
-        return new Response(JSON.stringify({ success: true }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
-      } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), { status: 400, headers: corsHeaders });
+    // --- API: Yayındaki Tierlist Sunucularını Getir ---
+    if (path === "/api/tierlist" && request.method === "GET") {
+      let tierlist = DEFAULT_TIERLIST;
+      if (env && env.TURKMC_KV) {
+        const stored = await env.TURKMC_KV.get("approved_tierlist", { type: "json" });
+        if (stored && Array.isArray(stored)) tierlist = stored;
       }
-    }
-
-    // --- API: Admin Başvuruyu Reddet / Sil ---
-    if (path === "/api/admin/reject" && request.method === "POST") {
-      try {
-        const { id } = await request.json();
-        if (env && env.TURKMC_KV) {
-          let pending = (await env.TURKMC_KV.get("pending_servers", { type: "json" })) || [];
-          pending = pending.filter(p => p.id !== id);
-          await env.TURKMC_KV.put("pending_servers", JSON.stringify(pending));
-        }
-        return new Response(JSON.stringify({ success: true }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
-      } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), { status: 400, headers: corsHeaders });
-      }
+      return new Response(JSON.stringify(tierlist), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
     }
 
     // Statik Dosyaları Sun (Cloudflare Workers Static Assets)
