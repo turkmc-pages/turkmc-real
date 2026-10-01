@@ -1,21 +1,13 @@
-name = "topluluk"
+name = "turkmc-real"
 main = "worker.js"
-compatibility_date = "2026-09-27"
+compatibility_date = "2024-01-01"
 
+# Statik dosyaları (HTML, PNG vb.) doğrudan sunmak için
 [assets]
 directory = "."
 binding = "ASSETS"
-run_worker_first = ["/api/*", "/admin"]
 
-[[d1_databases]]
-binding = "DB"
-database_name = "turkmc-db"
-database_id = "7cde682f-0ada-4629-b55b-49485372a83d"
-
-# Özel alan adı bağlamak istersen (örn. turkmc.com):
-# alan adını önce Cloudflare hesabına ekleyip zone yap, sonra
-# aşağıdaki iki satırı aç ve "senin-alan-adin.com" kısmını
-# kendi alan adınla değiştir, sonra tekrar deploy et.
-# [[routes]]
-# pattern = "senin-alan-adin.com"
-# custom_domain = true
+# İsteğe Bağlı KV Depolama Alanı (Cloudflare Panelinden oluşturulabilir)
+# [[kv_namespaces]]
+# binding = "TURKMC_KV"
+# id = "your_kv_namespace_id"
